@@ -18,11 +18,11 @@ set(IMGUI_SOURCES
 
 set(VENDOR_SOURCES ${GLAD_SOURCE} ${IMGUI_SOURCES})
 
-set(PROJECT_SOURCES
-        source/main.cpp
-        )
+set(COMMON_SOURCES
+        source/common/application.cpp)
 
 include_directories(
+        source/common
         vendor/glfw/include
         vendor/glad/include
         vendor/glm
@@ -30,5 +30,6 @@ include_directories(
         vendor/utils
 )
 
-add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${VENDOR_SOURCES})
-target_link_libraries(${PROJECT_NAME} glfw)
+add_executable(EX01_EMPTY_WINDOW
+        source/examples/ex01_empty_window.cpp ${COMMON_SOURCES} ${VENDOR_SOURCES})
+target_link_libraries(EX01_EMPTY_WINDOW glfw)
