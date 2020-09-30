@@ -8,43 +8,36 @@ void error_callback(int error, const char* description){
     std::cerr << "Error " << error << ": " << description << std::endl;
 }
 
-our::WindowConfiguration our::Application::configureWindowAndOpenGL() {
+void our::Application::configureOpenGL() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-
-    return {"OpenGL", {1280, 720}, false };
 }
 
-void our::Application::onInitialize() {
-    glClearColor(0.5f, 0.25f, 0.75f, 1.0f);
+our::WindowConfiguration our::Application::getWindowConfiguration() {
+    return {"OpenGL Application", {1280, 720}, false };
 }
 
-void our::Application::onImmediateGui(ImGuiIO&) {
-    ImGui::ShowDemoWindow();
-}
-
-void our::Application::onDraw(float deltaTime) {
-    glClear(GL_COLOR_BUFFER_BIT);
-}
-
-void our::Application::run() {
+int our::Application::run() {
 
     glfwSetErrorCallback(error_callback);
 
     if(!glfwInit()){
         std::cerr << "Failed to Initialize GLFW" << std::endl;
-        exit(-1);
+        return -1;
     }
 
-    auto win_config = configureWindowAndOpenGL();
+    configureOpenGL();
+
+    auto win_config = getWindowConfiguration();
 
     GLFWmonitor* monitor = win_config.isFullscreen ? glfwGetPrimaryMonitor() : nullptr;
     window = glfwCreateWindow(win_config.size.x, win_config.size.y, win_config.title, monitor, nullptr);
     if(!window) {
         std::cerr << "Failed to Create Window" << std::endl;
-        exit(-1);
+        glfwTerminate();
+        return -1;
     }
     glfwMakeContextCurrent(window);
 
@@ -80,6 +73,9 @@ void our::Application::run() {
 
         ImGui::Render();
 
+        auto frame_buffer_size = getFrameBufferSize();
+        glViewport(0, 0, frame_buffer_size.x, frame_buffer_size.y);
+
         double current_frame_time = glfwGetTime();
 
         onDraw(current_frame_time - last_frame_time);
@@ -94,6 +90,8 @@ void our::Application::run() {
         mouse.update();
     }
 
+    onDestroy();
+
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
@@ -101,6 +99,7 @@ void our::Application::run() {
     glfwDestroyWindow(window);
 
     glfwTerminate();
+    return 0;
 }
 
 void our::Application::setupCallbacks() {

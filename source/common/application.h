@@ -23,14 +23,15 @@ namespace our {
         Keyboard keyboard;
         Mouse mouse;
 
-
-        virtual WindowConfiguration configureWindowAndOpenGL();
+        virtual void configureOpenGL();
+        virtual WindowConfiguration getWindowConfiguration();
         virtual void setupCallbacks();
 
     public:
-        virtual void onInitialize();
-        virtual void onImmediateGui(ImGuiIO& io);
-        virtual void onDraw(float deltaTime);
+        virtual void onInitialize(){}
+        virtual void onImmediateGui(ImGuiIO& io){}
+        virtual void onDraw(double deltaTime){}
+        virtual void onDestroy(){}
 
         virtual void onKeyEvent(int key, int scancode, int action, int mods){}
         virtual void onCursorMoveEvent(double x, double y){}
@@ -38,17 +39,20 @@ namespace our {
         virtual void onMouseButtonEvent(int button, int action, int mods){}
         virtual void onScrollEvent(double x_offset, double y_offset){}
 
-        void run();
+        int run();
 
         GLFWwindow* getWindow(){ return window; }
-        const GLFWwindow* getWindow() const { return window; }
+        [[nodiscard]] const GLFWwindow* getWindow() const { return window; }
         Keyboard& getKeyboard() { return keyboard; }
-        const Keyboard& getKeyboard() const { return keyboard; }
+        [[nodiscard]] const Keyboard& getKeyboard() const { return keyboard; }
         Mouse& getMouse() { return mouse; }
-        const Mouse& getMouse() const { return mouse; }
+        [[nodiscard]] const Mouse& getMouse() const { return mouse; }
 
-        double getTime(){ return glfwGetTime(); }
-
+        glm::ivec2 getFrameBufferSize() {
+            glm::ivec2 size;
+            glfwGetFramebufferSize(window, &(size.x), &(size.y));
+            return size;
+        }
     };
 
 }
