@@ -4,3 +4,5 @@ build/
 
 # imgui saved state
 imgui.ini
+
+!assets/models/**/*.obj
