@@ -26,7 +26,7 @@ set(VENDOR_SOURCES ${GLAD_SOURCE} ${IMGUI_SOURCES})
 #target_link_libraries(vendor_libs glfw)
 
 set(COMMON_SOURCES
-        source/common/application.cpp source/common/shader.cpp)
+        source/common/application.cpp source/common/shader.cpp source/common/mesh/single-buffer-mesh.cpp)
 
 include_directories(
         source/common
@@ -63,3 +63,6 @@ target_link_libraries(EX08_ELEMENTS glfw)
 
 add_executable(EX09_STREAM source/examples/ex09_stream.cpp ${COMMON_SOURCES} ${VENDOR_SOURCES})
 target_link_libraries(EX09_STREAM glfw)
+
+add_executable(EX10_MODEL_LOADING source/examples/ex10_model_loading.cpp ${COMMON_SOURCES} ${VENDOR_SOURCES})
+target_link_libraries(EX10_MODEL_LOADING glfw)
