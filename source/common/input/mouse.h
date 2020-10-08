@@ -76,9 +76,10 @@ namespace our {
 
         bool isEnabled() const { return enabled; }
         void setEnabled(bool enabled, GLFWwindow* window) {
-            if(this->enabled != enabled)
-                if(enabled) enable(window);
+            if(this->enabled != enabled) {
+                if (enabled) enable(window);
                 else disable();
+            }
         }
 
     };

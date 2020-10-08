@@ -4,42 +4,42 @@
 #include "vertex-attributes.h"
 #include "common-vertex-types.h"
 
-#include <initializer_list>
+#include <glad/gl.h>
 
 namespace our {
 
     template<>
-    inline std::vector<VertexAttributeDefinition> define_buffer_accessors<ColoredVertex>() {
-        return {
-                {default_attribute_locations::POSITION, 3, GL_FLOAT, false, sizeof(ColoredVertex),
-                        (void *) offsetof(ColoredVertex, position), false},
-                {default_attribute_locations::COLOR, 4, GL_UNSIGNED_BYTE, true, sizeof(ColoredVertex),
-                        (void *) offsetof(ColoredVertex, color), false}
-        };
+    void setup_buffer_accessors<ColoredVertex>() {
+
+        glEnableVertexAttribArray(default_attribute_locations::POSITION);
+        glVertexAttribPointer(default_attribute_locations::POSITION, 3, GL_FLOAT, false, sizeof(ColoredVertex), (void*)offsetof(ColoredVertex, position));
+        glEnableVertexAttribArray(default_attribute_locations::COLOR);
+        glVertexAttribPointer(default_attribute_locations::COLOR, 4, GL_UNSIGNED_BYTE, true, sizeof(ColoredVertex), (void*)offsetof(ColoredVertex, color));
+
     };
 
     template<>
-    inline std::vector<VertexAttributeDefinition> define_buffer_accessors<TexturedVertex>() {
-        return {
-                {default_attribute_locations::POSITION, 3, GL_FLOAT, false, sizeof(TexturedVertex),
-                        (void *) offsetof(TexturedVertex, position), false},
-                {default_attribute_locations::TEX_COORD, 2, GL_FLOAT, false, sizeof(TexturedVertex),
-                        (void *) offsetof(TexturedVertex, tex_coord), false}
-        };
+    void setup_buffer_accessors<TexturedVertex>() {
+
+        glEnableVertexAttribArray(default_attribute_locations::POSITION);
+        glVertexAttribPointer(default_attribute_locations::POSITION, 3, GL_FLOAT, false, sizeof(TexturedVertex), (void*)offsetof(TexturedVertex, position));
+        glEnableVertexAttribArray(default_attribute_locations::TEX_COORD);
+        glVertexAttribPointer(default_attribute_locations::TEX_COORD, 2, GL_FLOAT, false, sizeof(TexturedVertex), (void*)offsetof(TexturedVertex, tex_coord));
+
     };
 
     template<>
-    inline std::vector<VertexAttributeDefinition> define_buffer_accessors<Vertex>() {
-        return {
-            {default_attribute_locations::POSITION, 3, GL_FLOAT, false, sizeof(Vertex),
-                    (void *) offsetof(Vertex, position), false},
-            {default_attribute_locations::COLOR, 4, GL_UNSIGNED_BYTE, true, sizeof(Vertex),
-                    (void *) offsetof(Vertex, color), false},
-            {default_attribute_locations::TEX_COORD, 2, GL_FLOAT, false, sizeof(Vertex),
-                    (void *) offsetof(Vertex, tex_coord), false},
-            {default_attribute_locations::NORMAL, 3, GL_FLOAT, false, sizeof(Vertex),
-                    (void *) offsetof(Vertex, normal), false}
-        };
+    void setup_buffer_accessors<Vertex>() {
+
+        glEnableVertexAttribArray(default_attribute_locations::POSITION);
+        glVertexAttribPointer(default_attribute_locations::POSITION, 3, GL_FLOAT, false, sizeof(Vertex), (void*)offsetof(Vertex, position));
+        glEnableVertexAttribArray(default_attribute_locations::COLOR);
+        glVertexAttribPointer(default_attribute_locations::COLOR, 4, GL_UNSIGNED_BYTE, true, sizeof(Vertex), (void*)offsetof(Vertex, color));
+        glEnableVertexAttribArray(default_attribute_locations::TEX_COORD);
+        glVertexAttribPointer(default_attribute_locations::TEX_COORD, 2, GL_FLOAT, false, sizeof(Vertex), (void*)offsetof(Vertex, tex_coord));
+        glEnableVertexAttribArray(default_attribute_locations::NORMAL);
+        glVertexAttribPointer(default_attribute_locations::NORMAL, 3, GL_FLOAT, false, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+
     };
 
 }

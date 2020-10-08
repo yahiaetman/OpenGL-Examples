@@ -1,4 +1,4 @@
-#include "single-buffer-mesh.h"
+#include "mesh.h"
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tinyobj/tiny_obj_loader.h>
@@ -67,9 +67,7 @@ void our::Mesh::loadOBJ(our::Mesh &mesh, const char* filename) {
             }
 
             if(mesh.isCreated()) mesh.destroy();
-            mesh.create({
-                our::define_buffer_accessors<Vertex>()
-            });
+            mesh.create({ our::setup_buffer_accessors<Vertex> });
             mesh.setElementData(elements, GL_STATIC_DRAW);
             mesh.setVertexData(0, vertices, GL_STATIC_DRAW);
         }

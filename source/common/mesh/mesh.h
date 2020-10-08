@@ -12,8 +12,6 @@
 
 namespace our {
 
-    typedef std::vector<VertexAttributeDefinition> VertexBufferAccessors;
-
     class Mesh {
     private:
         GLuint vertex_array = 0;
@@ -25,7 +23,7 @@ namespace our {
         GLsizei element_count = 0;
 
     public:
-        void create(const std::vector<VertexBufferAccessors>& accessors){
+        void create(const std::vector<std::function<void()>>& accessors){
             vertex_buffers.resize(accessors.size());
 
             glGenVertexArrays(1, &vertex_array);
@@ -38,21 +36,7 @@ namespace our {
             glGenBuffers(buffer_count, vertex_buffers.data());
             for(size_t buffer_index = 0; buffer_index < buffer_count; ++buffer_index){
                 glBindBuffer(GL_ARRAY_BUFFER, vertex_buffers[buffer_index]);
-                for(const auto& attribute: accessors[buffer_index]) {
-                    glEnableVertexAttribArray(attribute.attribute_location);
-                    if(attribute.is_integer){
-                        glVertexAttribIPointer(attribute.attribute_location, attribute.size, attribute.type,
-                                               attribute.stride, attribute.pointer);
-                    } else {
-                        if(attribute.type == GL_DOUBLE){
-                            glVertexAttribLPointer(attribute.attribute_location, attribute.size, attribute.type,
-                                                   attribute.stride, attribute.pointer);
-                        } else {
-                            glVertexAttribPointer(attribute.attribute_location, attribute.size, attribute.type,
-                                                  attribute.normalized, attribute.stride, attribute.pointer);
-                        }
-                    }
-                }
+                accessors[buffer_index]();
             }
 
             glBindVertexArray(0);

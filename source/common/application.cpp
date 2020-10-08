@@ -7,6 +7,8 @@
 #include <imgui_impl/imgui_impl_glfw.h>
 #include <imgui_impl/imgui_impl_opengl3.h>
 
+//#define ENABLE_OPENGL_DEBUG_MESSAGES
+
 void glfw_error_callback(int error, const char* description){
     std::cerr << "GLFW Error: " << error << ": " << description << std::endl;
 }
@@ -127,9 +129,16 @@ int our::Application::run() {
 
     gladLoadGL(glfwGetProcAddress);
 
+    std::cout << "VENDOR          : " << glGetString(GL_VENDOR) << std::endl;
+    std::cout << "RENDERER        : " << glGetString(GL_RENDERER) << std::endl;
+    std::cout << "VERSION         : " << glGetString(GL_VERSION) << std::endl;
+    std::cout << "GLSL VERSION    : " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+
+#if defined(ENABLE_OPENGL_DEBUG_MESSAGES)
     glDebugMessageCallback(opengl_callback, nullptr);
     glEnable(GL_DEBUG_OUTPUT);
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+#endif
 
     setupCallbacks();
     keyboard.enable(window);

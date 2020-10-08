@@ -39,15 +39,16 @@ namespace our {
             }
         }
 
-        bool isPressed(int key) const {return currentKeyStates[key]; }
-        bool justPressed(int key) const {return currentKeyStates[key] && !previousKeyStates[key];}
-        bool justReleased(int key) const {return !currentKeyStates[key] && previousKeyStates[key];}
+        [[nodiscard]] bool isPressed(int key) const {return currentKeyStates[key]; }
+        [[nodiscard]] bool justPressed(int key) const {return currentKeyStates[key] && !previousKeyStates[key];}
+        [[nodiscard]] bool justReleased(int key) const {return !currentKeyStates[key] && previousKeyStates[key];}
 
-        bool isEnabled() const { return enabled; }
+        [[nodiscard]] bool isEnabled() const { return enabled; }
         void setEnabled(bool enabled, GLFWwindow* window) {
-            if(this->enabled != enabled)
-                if(enabled) enable(window);
+            if(this->enabled != enabled) {
+                if (enabled) enable(window);
                 else disable();
+            }
         }
     };
 
