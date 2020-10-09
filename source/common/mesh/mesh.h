@@ -57,12 +57,12 @@ namespace our {
         ~Mesh(){ destroy(); }
 
         template<typename T>
-        void setElementData(const std::vector<T>& data, GLenum usage){
+        void setElementData(const std::vector<T>& data, GLenum usage = GL_STATIC_DRAW){
             setElementData(data.data(), data.size(), usage);
         }
 
         template<typename T>
-        void setElementData(T const * data, size_t count, GLenum usage){
+        void setElementData(T const * data, size_t count, GLenum usage = GL_STATIC_DRAW){
             if(element_buffer == 0) return;
 
             element_size = sizeof(T);
@@ -100,9 +100,6 @@ namespace our {
         //Delete copy constructor and assignment operation
         Mesh(Mesh const &) = delete;
         Mesh &operator=(Mesh const &) = delete;
-
-        //Utility Functions
-        static void loadOBJ(Mesh& mesh, const char* filename);
 
     };
 

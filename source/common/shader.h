@@ -68,6 +68,10 @@ namespace our {
             glUniform3f(getUniformLocation(uniform), value.x, value.y, value.z);
         }
 
+        void set(const std::string &uniform, glm::vec4 value) {
+            glUniform4f(getUniformLocation(uniform), value.x, value.y, value.z, value.w);
+        }
+
         void set(const std::string &uniform, glm::mat4 value)  {
             glUniformMatrix4fv(getUniformLocation(uniform), 1, GL_FALSE, glm::value_ptr(value));
         }

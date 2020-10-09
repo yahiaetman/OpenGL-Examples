@@ -4,6 +4,7 @@
 
 #include <mesh/mesh.h>
 #include <mesh/common-vertex-types.h>
+#include <mesh/mesh-utils.h>
 
 struct Vertex {
     glm::vec3 position;
@@ -47,7 +48,7 @@ class MeshApplication : public our::Application {
             2, 3, 0
         },GL_STATIC_DRAW);
 
-        our::Mesh::loadOBJ(model, "assets/models/Suzanne/Suzanne.obj");
+        our::mesh_utils::loadOBJ(model, "assets/models/Suzanne/Suzanne.obj");
 
     }
 

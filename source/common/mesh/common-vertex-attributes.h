@@ -9,7 +9,7 @@
 namespace our {
 
     template<>
-    void setup_buffer_accessors<ColoredVertex>() {
+    inline void setup_buffer_accessors<ColoredVertex>() {
 
         glEnableVertexAttribArray(default_attribute_locations::POSITION);
         glVertexAttribPointer(default_attribute_locations::POSITION, 3, GL_FLOAT, false, sizeof(ColoredVertex), (void*)offsetof(ColoredVertex, position));
@@ -19,7 +19,7 @@ namespace our {
     };
 
     template<>
-    void setup_buffer_accessors<TexturedVertex>() {
+    inline void setup_buffer_accessors<TexturedVertex>() {
 
         glEnableVertexAttribArray(default_attribute_locations::POSITION);
         glVertexAttribPointer(default_attribute_locations::POSITION, 3, GL_FLOAT, false, sizeof(TexturedVertex), (void*)offsetof(TexturedVertex, position));
@@ -29,7 +29,7 @@ namespace our {
     };
 
     template<>
-    void setup_buffer_accessors<Vertex>() {
+    inline void setup_buffer_accessors<Vertex>() {
 
         glEnableVertexAttribArray(default_attribute_locations::POSITION);
         glVertexAttribPointer(default_attribute_locations::POSITION, 3, GL_FLOAT, false, sizeof(Vertex), (void*)offsetof(Vertex, position));
