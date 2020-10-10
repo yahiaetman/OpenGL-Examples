@@ -25,7 +25,7 @@ struct Transform {
     }
 };
 
-class ViewportsApplication : public our::Application {
+class CameraStackApplication : public our::Application {
 
     our::ShaderProgram program;
     our::Mesh model;
@@ -40,7 +40,7 @@ class ViewportsApplication : public our::Application {
     int clicks = 0;
 
     our::WindowConfiguration getWindowConfiguration() override {
-        return { "Viewports and Scissors", {1280, 720}, false };
+        return { "Camera Stacking", {1280, 720}, false };
     }
 
     void onInitialize() override {
@@ -160,5 +160,5 @@ class ViewportsApplication : public our::Application {
 };
 
 int main(int argc, char** argv) {
-    return ViewportsApplication().run();
+    return CameraStackApplication().run();
 }

@@ -53,6 +53,12 @@ namespace our {
             glfwGetFramebufferSize(window, &(size.x), &(size.y));
             return size;
         }
+
+        glm::ivec2 getWindowSize() {
+            glm::ivec2 size;
+            glfwGetWindowSize(window, &(size.x), &(size.y));
+            return size;
+        }
     };
 
 }

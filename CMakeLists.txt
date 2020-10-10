@@ -90,3 +90,6 @@ target_link_libraries(EX17_VIEWPORTS_SCISSORS glfw)
 
 add_executable(EX18_CAMERA_STACKING source/examples/ex18_camera_stacking.cpp ${COMMON_SOURCES} ${VENDOR_SOURCES})
 target_link_libraries(EX18_CAMERA_STACKING glfw)
+
+add_executable(EX19_RAY_CASTING source/examples/ex19_ray_casting.cpp ${COMMON_SOURCES} ${VENDOR_SOURCES})
+target_link_libraries(EX19_RAY_CASTING glfw)
