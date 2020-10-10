@@ -6,8 +6,8 @@
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 
-#include "input/keyboard.h"
-#include "input/mouse.h"
+#include "input/keyboard.hpp"
+#include "input/mouse.hpp"
 
 namespace our {
 

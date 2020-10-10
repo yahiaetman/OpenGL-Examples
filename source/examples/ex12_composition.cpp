@@ -1,10 +1,12 @@
-#include <application.h>
-#include <shader.h>
-#include <imgui-utils/utils.h>
+#include <application.hpp>
+#include <shader.hpp>
+#include <imgui-utils/utils.hpp>
 
-#include <mesh/mesh.h>
-#include <mesh/common-vertex-types.h>
-#include <mesh/common-vertex-attributes.h>
+#include <mesh/mesh.hpp>
+#include <mesh/common-vertex-types.hpp>
+#include <mesh/common-vertex-attributes.hpp>
+
+#include <glm/gtx/euler_angles.hpp>
 
 enum class TransformationType : int {
     Translation = 0,
@@ -57,7 +59,7 @@ class CompositionApplication : public our::Application {
                     transformation_matrix = glm::translate(glm::mat4(1.0f), transformation.value) * transformation_matrix;
                     break;
                 case TransformationType::Rotation:
-                    transformation_matrix = glm::mat4_cast(glm::quat(transformation.value)) * transformation_matrix;
+                    transformation_matrix = glm::yawPitchRoll(transformation.value.y, transformation.value.x, transformation.value.z) * transformation_matrix;
                     break;
                 case TransformationType::Scaling:
                     transformation_matrix = glm::scale(glm::mat4(1.0f), transformation.value) * transformation_matrix;
@@ -87,7 +89,7 @@ class CompositionApplication : public our::Application {
 
         ImGui::Begin("Controls");
 
-        ImGui::Text("Transformation Matrix");
+        ImGui::Text("Transformations");
 
         const char* transformation_names[] = {
                 "Translation",

@@ -1,8 +1,8 @@
 #ifndef OUR_COMMON_VERTEX_ATTRIBUTES_H
 #define OUR_COMMON_VERTEX_ATTRIBUTES_H
 
-#include "vertex-attributes.h"
-#include "common-vertex-types.h"
+#include "vertex-attributes.hpp"
+#include "common-vertex-types.hpp"
 
 #include <glad/gl.h>
 

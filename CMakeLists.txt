@@ -72,3 +72,21 @@ target_link_libraries(EX11_TRANSFORMATION glfw)
 
 add_executable(EX12_COMPOSITION source/examples/ex12_composition.cpp ${COMMON_SOURCES} ${VENDOR_SOURCES})
 target_link_libraries(EX12_COMPOSITION glfw)
+
+add_executable(EX13_CAMERA source/examples/ex13_camera.cpp ${COMMON_SOURCES} ${VENDOR_SOURCES})
+target_link_libraries(EX13_CAMERA glfw)
+
+add_executable(EX14_PROJECTION source/examples/ex14_projection.cpp ${COMMON_SOURCES} ${VENDOR_SOURCES})
+target_link_libraries(EX14_PROJECTION glfw)
+
+add_executable(EX15_DEPTH_TESTING source/examples/ex15_depth_testing.cpp ${COMMON_SOURCES} ${VENDOR_SOURCES})
+target_link_libraries(EX15_DEPTH_TESTING glfw)
+
+add_executable(EX16_FACE_CULLING source/examples/ex16_face_culling.cpp ${COMMON_SOURCES} ${VENDOR_SOURCES})
+target_link_libraries(EX16_FACE_CULLING glfw)
+
+add_executable(EX17_VIEWPORTS_SCISSORS source/examples/ex17_viewports_and_scissors.cpp ${COMMON_SOURCES} ${VENDOR_SOURCES})
+target_link_libraries(EX17_VIEWPORTS_SCISSORS glfw)
+
+add_executable(EX18_CAMERA_STACKING source/examples/ex18_camera_stacking.cpp ${COMMON_SOURCES} ${VENDOR_SOURCES})
+target_link_libraries(EX18_CAMERA_STACKING glfw)

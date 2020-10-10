@@ -1,10 +1,10 @@
-#include <application.h>
-#include <shader.h>
-#include <imgui-utils/utils.h>
+#include <application.hpp>
+#include <shader.hpp>
+#include <imgui-utils/utils.hpp>
 
-#include <mesh/mesh.h>
-#include <mesh/common-vertex-types.h>
-#include <mesh/mesh-utils.h>
+#include <mesh/mesh.hpp>
+#include <mesh/common-vertex-types.hpp>
+#include <mesh/mesh-utils.hpp>
 
 struct Vertex {
     glm::vec3 position;

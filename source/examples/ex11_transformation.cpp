@@ -1,11 +1,10 @@
-#include <application.h>
-#include <shader.h>
-#include <imgui-utils/utils.h>
+#include <application.hpp>
+#include <shader.hpp>
+#include <imgui-utils/utils.hpp>
 
-#include <mesh/mesh.h>
-#include <mesh/common-vertex-types.h>
-#include <mesh/common-vertex-attributes.h>
-
+#include <mesh/mesh.hpp>
+#include <mesh/common-vertex-types.hpp>
+#include <mesh/common-vertex-attributes.hpp>
 
 class TransformationApplication : public our::Application {
 

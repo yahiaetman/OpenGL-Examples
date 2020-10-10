@@ -31,6 +31,28 @@ namespace our {
                 {GL_FILL, "GL_FILL"}
         };
 
+        inline EnumMap comparison_functions = {
+                {GL_ALWAYS, "GL_ALWAYS"},
+                {GL_NEVER, "GL_NEVER"},
+                {GL_EQUAL, "GL_EQUAL"},
+                {GL_NOTEQUAL, "GL_NOTEQUAL"},
+                {GL_LESS, "GL_LESS"},
+                {GL_LEQUAL, "GL_LEQUAL"},
+                {GL_GREATER, "GL_GREATER"},
+                {GL_GEQUAL, "GL_GEQUAL"}
+        };
+
+        inline EnumMap face_windings = {
+                {GL_CCW, "GL_CCW"},
+                {GL_CW, "GL_CW"}
+        };
+
+        inline EnumMap facets = {
+                {GL_FRONT, "GL_FRONT"},
+                {GL_BACK, "GL_BACK"},
+                {GL_FRONT_AND_BACK, "GL_FRONT_AND_BACK"}
+        };
+
     }
 
     template<typename T>
@@ -69,28 +91,47 @@ namespace our {
         size_t last = starting_index + distance - 1;
         std::optional<size_t> item_to_delete, item_to_add;
         std::optional<std::tuple<It, It>> items_to_swap;
+        float item_spacing = ImGui::GetStyle().ItemSpacing.x, window_width = ImGui::GetWindowWidth();
+        float full_button_width = window_width - 2 * item_spacing;
+        float third_button_width = (window_width - 4 * item_spacing) / 3;
         for(It it = begin, prev; it != end; prev = it, it++, ++index){
             ImGui::PushID(index);
 
-            if(ImGui::Button("+"))
+            ImGui::PushStyleColor(ImGuiCol_Button, {0.25,0.65,0.15,1});
+            if(ImGui::Button("+", ImVec2(full_button_width, 0)))
                 item_to_add = index;
+            ImGui::PopStyleColor();
             ImGui::Separator();
 
             item_gui(index, *it);
 
-            if(ImGui::Button("-"))
+            ImGui::PushStyleColor(ImGuiCol_Button, {0.65,0.15,0.25,1});
+            if(ImGui::Button("DELETE", ImVec2(third_button_width, 0)))
                 item_to_delete = index;
+            ImGui::PopStyleColor();
             ImGui::SameLine();
-            if(ImGui::Button("^") && index > starting_index)
+            bool up_enabled = index > starting_index;
+            if (!up_enabled)
+                ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+            if(ImGui::Button("UP", ImVec2(third_button_width, 0)) && up_enabled)
                 items_to_swap = { prev, it };
+            if (!up_enabled)
+                ImGui::PopStyleVar();
             ImGui::SameLine();
-            if(ImGui::Button("v") && index < last)
+            bool down_enabled = index < last;
+            if (!down_enabled)
+                ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+            if(ImGui::Button("DOWN", ImVec2(third_button_width, 0)) && down_enabled)
                 items_to_swap = { it, it + 1 };
+            if (!down_enabled)
+                ImGui::PopStyleVar();
             ImGui::Separator();
             ImGui::PopID();
         }
-        if(ImGui::Button("+"))
+        ImGui::PushStyleColor(ImGuiCol_Button, {0.25,0.65,0.15,1});
+        if(ImGui::Button("+", ImVec2(full_button_width, 0)))
             item_to_add = index;
+        ImGui::PopStyleColor();
 
         if(item_to_add.has_value())
             item_add(item_to_add.value());

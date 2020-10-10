@@ -1,5 +1,5 @@
-#include <application.h>
-#include <shader.h>
+#include <application.hpp>
+#include <shader.hpp>
 #include <iostream>
 
 

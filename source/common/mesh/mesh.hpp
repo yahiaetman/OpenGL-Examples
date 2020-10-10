@@ -5,10 +5,11 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <iostream>
 
 #include <glad/gl.h>
 
-#include "vertex-attributes.h"
+#include "vertex-attributes.hpp"
 
 namespace our {
 
@@ -63,7 +64,10 @@ namespace our {
 
         template<typename T>
         void setElementData(T const * data, size_t count, GLenum usage = GL_STATIC_DRAW){
-            if(element_buffer == 0) return;
+            if(element_buffer == 0) {
+                std::cerr << "MESH ERROR: Setting element data before creating element buffer\n";
+                return;
+            }
 
             element_size = sizeof(T);
 
@@ -78,15 +82,57 @@ namespace our {
         }
 
         template<typename T>
+        void getElementData(std::vector<T>& elements){
+            assert(sizeof(T) == element_size);
+            GLint size;
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer);
+            glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+            assert((size % sizeof(T)) == 0);
+            elements.resize(size / sizeof(T));
+            glGetBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, size, elements.data());
+        }
+
+        template<typename T>
+        std::vector<T>&& getElementData(){
+            std::vector<T> elements;
+            getElementData(elements);
+            return elements;
+        }
+
+        template<typename T>
         void setVertexData(size_t buffer_index, const std::vector<T>& data, GLenum usage = GL_STATIC_DRAW){
             setVertexData(buffer_index, data.data(), data.size(), usage);
         }
 
         template<typename T>
         void setVertexData(size_t buffer_index, T const * data, size_t count, GLenum usage = GL_STATIC_DRAW){
-            if(buffer_index >= vertex_buffers.size()) return;
+            if(buffer_index >= vertex_buffers.size()) {
+                std::cerr << "MESH ERROR: Setting vertex data to an out-of-bound vertex buffer (" << buffer_index << " >= " << vertex_buffers.size() << ")\n";
+                return;
+            }
             glBindBuffer(GL_ARRAY_BUFFER, vertex_buffers[buffer_index]);
             glBufferData(GL_ARRAY_BUFFER, count*sizeof(T), data, usage);
+        }
+
+        template<typename T>
+        void getVertexData(size_t buffer_index, std::vector<T>& vertices){
+            if(buffer_index >= vertex_buffers.size()) {
+                std::cerr << "MESH ERROR: Requesting vertex data to an out-of-bound vertex buffer (" << buffer_index << " >= " << vertex_buffers.size() << ")\n";
+                return;
+            }
+            GLint size;
+            glBindBuffer(GL_ARRAY_BUFFER, vertex_buffers[buffer_index]);
+            glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+            assert((size % sizeof(T)) == 0);
+            vertices.resize(size / sizeof(T));
+            glGetBufferSubData(GL_ARRAY_BUFFER, 0, size, vertices.data());
+        }
+
+        template<typename T>
+        std::vector<T>&& getVertexData(size_t buffer_index){
+            std::vector<T> vertices;
+            getVertexData<>(buffer_index, vertices);
+            return vertices;
         }
 
         void draw(GLenum mode = GL_TRIANGLES, GLsizei start = 0, GLsizei count = 0) const {

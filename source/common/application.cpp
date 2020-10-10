@@ -1,4 +1,4 @@
-#include "application.h"
+#include "application.hpp"
 
 #include <iostream>
 #include <string>
@@ -164,6 +164,8 @@ int our::Application::run() {
         ImGui::NewFrame();
 
         onImmediateGui(io);
+
+        //std::cout << io.WantCaptureKeyboard << ", " << io.WantCaptureMouse << std::endl;
 
         keyboard.setEnabled(!io.WantCaptureKeyboard, window);
         mouse.setEnabled(!io.WantCaptureMouse, window);

@@ -1,6 +1,6 @@
-#include <application.h>
-#include <shader.h>
-#include <imgui-utils/utils.h>
+#include <application.hpp>
+#include <shader.hpp>
+#include <imgui-utils/utils.hpp>
 
 #include <vector>
 

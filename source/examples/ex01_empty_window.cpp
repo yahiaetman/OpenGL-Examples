@@ -1,4 +1,4 @@
-#include <application.h>
+#include <application.hpp>
 
 class EmptyWindowApplication : public our::Application {
 
