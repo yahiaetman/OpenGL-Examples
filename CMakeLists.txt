@@ -93,3 +93,6 @@ target_link_libraries(EX18_CAMERA_STACKING glfw)
 
 add_executable(EX19_RAY_CASTING source/examples/ex19_ray_casting.cpp ${COMMON_SOURCES} ${VENDOR_SOURCES})
 target_link_libraries(EX19_RAY_CASTING glfw)
+
+add_executable(EX20_SCENE_GRAPHS source/examples/ex20_scene_graphs.cpp ${COMMON_SOURCES} ${VENDOR_SOURCES})
+target_link_libraries(EX20_SCENE_GRAPHS glfw)

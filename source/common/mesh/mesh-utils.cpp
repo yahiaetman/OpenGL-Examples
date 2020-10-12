@@ -65,10 +65,10 @@ void our::mesh_utils::loadOBJ(our::Mesh &mesh, const char* filename) {
 
 
             vertex.color = {
-                    attrib.colors[3 * index.vertex_index + 0],
-                    attrib.colors[3 * index.vertex_index + 0],
-                    attrib.colors[3 * index.vertex_index + 0],
-                    1.0f
+                    attrib.colors[3 * index.vertex_index + 0] * 255,
+                    attrib.colors[3 * index.vertex_index + 1] * 255,
+                    attrib.colors[3 * index.vertex_index + 2] * 255,
+                    255
             };
 
             auto it = vertex_map.find(vertex);

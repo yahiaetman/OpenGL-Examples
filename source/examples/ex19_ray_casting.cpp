@@ -65,7 +65,6 @@ class RayCastingApplication : public our::Application {
         std::uniform_real_distribution angle_generator(0.0f, glm::pi<float>() * 2);
         std::uniform_real_distribution scale_generator(0.5f, 4.0f);
 
-        //objects.push_back({ {0,-1,0}, {0,0,glm::pi<float>()}, {300,2,300} });
         for(int x = -24; x <= 24; x += 8) {
             for (int z = -24; z <= 24; z += 8) {
                 float y = y_generator(random_generator);
@@ -130,8 +129,8 @@ class RayCastingApplication : public our::Application {
                 glm::vec3 v2 = world_matrix * glm::vec4(model_vertices[model_elements[element++]].position, 1.0f);
                 glm::vec2 barycentric_coords; float triangle_hit_distance;
                 if(glm::intersectRayTriangle(ray_origin, ray_direction, v0, v1, v2, barycentric_coords, triangle_hit_distance)){
-                    if(triangle_hit_distance < nearest_hit_distance){
-                        nearest_hit_distance = nearest_hit_distance;
+                    if(triangle_hit_distance > 0 && triangle_hit_distance < nearest_hit_distance){
+                        nearest_hit_distance = triangle_hit_distance;
                         hit_transform_index = index;
                         nearest_hit_point =
                                 v1 * barycentric_coords.x +
