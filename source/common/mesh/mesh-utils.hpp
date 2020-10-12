@@ -13,6 +13,13 @@ namespace our::mesh_utils {
                 const glm::vec3& size = {1,1,1},
                 const glm::vec2& texture_offset = {0, 0},
                 const glm::vec2& texture_tiling = {1, 1});
+    void Sphere(Mesh& mesh,
+                const glm::ivec2& segments = {32, 16},
+                bool colored = false,
+                const glm::vec3& center = {0,0,0},
+                float radius = 0.5f,
+                const glm::vec2& texture_offset = {0, 0},
+                const glm::vec2& texture_tiling = {1, 1});
 
 }
 

@@ -153,7 +153,7 @@ void our::mesh_utils::Cuboid(Mesh& mesh,
             {corners[6], colored_faces ? YELLOW : WHITE, tex_coords[3], normals[2][0]},
             {corners[4], colored_faces ? YELLOW : WHITE, tex_coords[1], normals[2][0]},
     };
-    std::vector<GLuint> indices = {
+    std::vector<GLuint> elements = {
             //Upper Face
             0, 1, 2, 2, 3, 0,
             //Lower Face
@@ -170,5 +170,45 @@ void our::mesh_utils::Cuboid(Mesh& mesh,
 
     mesh.create({our::setup_buffer_accessors<Vertex>});
     mesh.setVertexData(0, vertices);
-    mesh.setElementData(indices);
+    mesh.setElementData(elements);
 };
+
+void our::mesh_utils::Sphere(our::Mesh& mesh, const glm::ivec2& segments, bool colored,
+            const glm::vec3& center, float radius,
+            const glm::vec2& texture_offset, const glm::vec2& texture_tiling){
+
+    std::vector<our::Vertex> vertices;
+    std::vector<GLuint> elements;
+
+    for(int lat = 0; lat <= segments.y; lat++){
+        float v = (float)lat / segments.y;
+        float pitch = v * glm::pi<float>() - glm::half_pi<float>();
+        float cos = glm::cos(pitch), sin = glm::sin(pitch);
+        for(int lng = 0; lng <= segments.x; lng++){
+            float u = (float)lng/segments.x;
+            float yaw = u * glm::two_pi<float>();
+            glm::vec3 normal = {cos * glm::cos(yaw), sin, cos * glm::sin(yaw)};
+            glm::vec3 position = radius * normal + center;
+            glm::vec2 tex_coords = texture_tiling * glm::vec2(u, v) + texture_offset;
+            our::Color color = colored ? our::Color(127.5f * (normal + 1.0f), 255) : WHITE;
+            vertices.push_back({position, color, tex_coords, normal});
+        }
+    }
+
+    for(int lat = 1; lat <= segments.y; lat++){
+        int start = lat*(segments.x+1);
+        for(int lng = 1; lng <= segments.x; lng++){
+            int prev_lng = lng-1;
+            elements.push_back(lng + start);
+            elements.push_back(lng + start - segments.x - 1);
+            elements.push_back(prev_lng + start - segments.x - 1);
+            elements.push_back(prev_lng + start - segments.x - 1);
+            elements.push_back(prev_lng + start);
+            elements.push_back(lng + start);
+        }
+    }
+
+    mesh.create({our::setup_buffer_accessors<Vertex>});
+    mesh.setVertexData(0, vertices);
+    mesh.setElementData(elements);
+}

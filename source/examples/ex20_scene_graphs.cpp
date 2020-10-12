@@ -12,9 +12,9 @@
 #include <json/json.hpp>
 
 #include <fstream>
+#include <string>
 #include <unordered_map>
-
-#include <glm/gtx/string_cast.hpp>
+#include <optional>
 
 namespace glm {
     template<length_t L, typename T, qualifier Q>
@@ -28,7 +28,7 @@ struct Transform {
     std::string name;
     glm::vec4 tint;
     glm::vec3 translation, rotation, scale;
-    std::weak_ptr<our::Mesh> mesh;
+    std::optional<std::string> mesh;
     std::vector<std::shared_ptr<Transform>> children;
 
 
@@ -38,10 +38,10 @@ struct Transform {
             const glm::vec3& translation = {0,0,0},
             const glm::vec3& rotation = {0,0,0},
             const glm::vec3& scale = {1,1,1},
-            std::weak_ptr<our::Mesh> mesh = std::weak_ptr<our::Mesh>()
+            const std::optional<std::string>& mesh = std::nullopt
                     ): name(name), tint(tint), translation(translation), rotation(rotation), scale(scale), mesh(mesh) {}
 
-    glm::mat4 to_mat4() const {
+    [[nodiscard]] glm::mat4 to_mat4() const {
         return glm::translate(glm::mat4(1.0f), translation) *
                 glm::yawPitchRoll(rotation.y, rotation.x, rotation.z) *
                 glm::scale(glm::mat4(1.0f), scale);
@@ -51,9 +51,10 @@ struct Transform {
 class SceneGraphApplication : public our::Application {
 
     our::ShaderProgram program;
-    std::unordered_map<std::string, std::shared_ptr<our::Mesh>> meshes;
+    std::unordered_map<std::string, std::unique_ptr<our::Mesh>> meshes;
 
-    std::shared_ptr<Transform> root;
+    std::unordered_map<std::string, std::shared_ptr<Transform>> roots;
+    std::string current_root_name;
 
     our::Camera camera;
     our::FlyCameraController controller;
@@ -68,8 +69,12 @@ class SceneGraphApplication : public our::Application {
         program.attach("assets/shaders/ex11_transformation/tint.frag", GL_FRAGMENT_SHADER);
         program.link();
 
-        meshes["Cuboid"] = std::make_shared<our::Mesh>();
-        our::mesh_utils::Cuboid(*(meshes["Cuboid"]), true);
+        meshes["cube"] = std::make_unique<our::Mesh>();
+        our::mesh_utils::Cuboid(*(meshes["cube"]), true);
+        meshes["rod"] = std::make_unique<our::Mesh>();
+        our::mesh_utils::Cuboid(*(meshes["rod"]), true, {0, 0, 0.5});
+        meshes["sphere"] = std::make_unique<our::Mesh>();
+        our::mesh_utils::Sphere(*(meshes["sphere"]), {32, 16}, true);
 
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
@@ -81,7 +86,10 @@ class SceneGraphApplication : public our::Application {
 
         controller.initialize(this, &camera);
 
-        loadSceneGraph("assets/data/ex20_scene_graphs/scene.json");
+        roots["simple"] = loadSceneGraph("assets/data/ex20_scene_graphs/simple.json");
+        roots["solar-system"] = loadSceneGraph("assets/data/ex20_scene_graphs/solar-system.json");
+        roots["human"] = loadSceneGraph("assets/data/ex20_scene_graphs/human.json");
+        current_root_name = "simple";
 
         glClearColor(0, 0, 0, 0);
 
@@ -104,10 +112,7 @@ class SceneGraphApplication : public our::Application {
                 json.value<glm::vec3>("scale", {1, 1, 1})
         );
         if(json.contains("mesh")){
-            auto mesh_name = json["mesh"].get<std::string>();
-            auto it = meshes.find(mesh_name);
-            if(it != meshes.end())
-                node->mesh = it->second;
+            node->mesh = json["mesh"].get<std::string>();
         }
         if(json.contains("children")){
             for(auto& child: json["children"]){
@@ -117,22 +122,24 @@ class SceneGraphApplication : public our::Application {
         return node;
     }
 
-    void loadSceneGraph(const std::string& scene_file){
+    std::shared_ptr<Transform> loadSceneGraph(const std::string& scene_file){
         std::ifstream file_in(scene_file);
         nlohmann::json json;
         file_in >> json;
         file_in.close();
 
-        root = loadNode(json);
+        return loadNode(json);
     }
 
     void drawNode(const std::shared_ptr<Transform>& node, const glm::mat4& parent_transform_matrix){
         glm::mat4 transform_matrix = parent_transform_matrix * node->to_mat4();
-        if(!node->mesh.expired()){
-            //std::cout << "Node: " << node->name << " -> " << glm::to_string(transform_matrix) << std::endl;
-            program.set("tint", node->tint);
-            program.set("transform", transform_matrix);
-            node->mesh.lock()->draw();
+        if(node->mesh.has_value()){
+            auto it = meshes.find(node->mesh.value());
+            if(it != meshes.end()) {
+                program.set("tint", node->tint);
+                program.set("transform", transform_matrix);
+                it->second->draw();
+            }
         }
         for(auto& child: node->children){
             drawNode(child, transform_matrix);
@@ -146,7 +153,7 @@ class SceneGraphApplication : public our::Application {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        drawNode(root, camera.getVPMatrix());
+        drawNode(roots[current_root_name], camera.getVPMatrix());
 
     }
 
@@ -156,6 +163,41 @@ class SceneGraphApplication : public our::Application {
             mesh->destroy();
         }
         meshes.clear();
+    }
+
+    void displayNodeGui(const std::shared_ptr<Transform>& node, const std::string& path){
+        std::string label = node->name + "##" + path;
+        if(ImGui::TreeNode(label.c_str())){
+            if(node->mesh.has_value()) {
+                ImGui::Text("Mesh: %s", node->mesh.value().c_str());
+                ImGui::ColorEdit4("Tint", glm::value_ptr(node->tint));
+            }
+            ImGui::DragFloat3("Translation", glm::value_ptr(node->translation), 0.1f);
+            ImGui::DragFloat3("Rotation", glm::value_ptr(node->rotation), 0.01f);
+            ImGui::DragFloat3("Scale", glm::value_ptr(node->scale), 0.1f);
+            for(size_t index = 0, size = node->children.size(); index < size; ++index){
+                displayNodeGui(node->children[index], path + "/" + std::to_string(index));
+            }
+            ImGui::TreePop();
+        }
+    }
+
+    void onImmediateGui(ImGuiIO &io) override {
+        ImGui::Begin("Scene Graph");
+
+        if(ImGui::BeginCombo("Scene", current_root_name.c_str())){
+            for(auto& [name, root] : roots){
+                bool selected = current_root_name == name;
+                if(ImGui::Selectable(name.c_str(), selected))
+                    current_root_name = name;
+                if(selected)
+                    ImGui::SetItemDefaultFocus();
+            }
+            ImGui::EndCombo();
+        }
+
+        displayNodeGui(roots[current_root_name], "0");
+        ImGui::End();
     }
 
 };

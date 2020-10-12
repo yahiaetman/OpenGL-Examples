@@ -1,0 +1,101 @@
+{
+  "name": "sun-axis",
+  "children": [
+    {
+      "name": "sun",
+      "scale": [10, 10, 10],
+      "mesh": "sphere",
+      "tint": [0.9, 0.7, 0.1, 1.0]
+    },
+    {
+      "name": "mercury-arm",
+      "rotation": [0, 0.2, 0],
+      "children": [
+        {
+          "name": "mercury-axis",
+          "translation": [12, 0, 0],
+          "children":[
+            {
+              "name": "mercury",
+              "scale": [1, 1, 1],
+              "mesh": "sphere",
+              "tint": [0.2, 0.2, 0.2, 1.0]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "venus-arm",
+      "rotation": [0, 0.3, 0],
+      "children": [
+        {
+          "name": "venus-axis",
+          "translation": [16, 0, 0],
+          "children":[
+            {
+              "name": "venus",
+              "scale": [1, 1, 1],
+              "mesh": "sphere",
+              "tint": [0.5, 0.5, 0.5, 1.0]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "earth-arm",
+      "rotation": [0, 0.1, 0],
+      "children": [
+        {
+          "name": "earth-axis",
+          "translation": [30, 0, 0],
+          "children":[
+            {
+              "name": "earth",
+              "scale": [5, 5, 5],
+              "mesh": "sphere",
+              "tint": [0.1, 0.5, 0.9, 1.0]
+            },
+            {
+              "name": "moon-arm",
+              "rotation": [0, 0.5, 0],
+              "children": [
+                {
+                  "name": "moon-axis",
+                  "translation": [7, 0, 0],
+                  "children":[
+                    {
+                      "name": "moon",
+                      "scale": [0.5, 0.5, 0.5],
+                      "mesh": "sphere",
+                      "tint": [0.1, 0.2, 0.3, 1.0]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mars-arm",
+      "rotation": [0, -0.1, 0],
+      "children": [
+        {
+          "name": "mars-axis",
+          "translation": [40, 0, 0],
+          "children":[
+            {
+              "name": "mars",
+              "scale": [3, 3, 3],
+              "mesh": "sphere",
+              "tint": [0.9, 0.1, 0.2, 1.0]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

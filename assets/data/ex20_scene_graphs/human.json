@@ -1,0 +1,139 @@
+{
+  "name": "human",
+  "children": [
+    {
+      "name": "abdomen",
+      "mesh": "cube",
+      "scale": [0.4, 1, 0.1]
+    },
+    {
+      "name": "neck-joint",
+      "translation": [0, 0.5, 0],
+      "children": [
+        {
+          "name": "neck",
+          "mesh": "rod",
+          "scale": [0.1, 0.1, 0.2],
+          "rotation": [-1.5, 0, 0]
+        },
+        {
+          "name": "head-joint",
+          "translation": [0, 0.3, 0],
+          "children": [
+            {
+              "name": "head",
+              "mesh": "sphere",
+              "scale": [0.4, 0.4, 0.4]
+            },
+            {
+              "name": "eye-left",
+              "mesh": "sphere",
+              "scale": [0.05, 0.05, 0.05],
+              "translation": [-0.1, 0, 0.2],
+              "tint": [0.1, 0.1, 0.1, 1]
+            },
+            {
+              "name": "eye-right",
+              "mesh": "sphere",
+              "scale": [0.05, 0.05, 0.05],
+              "translation": [0.1, 0, 0.2],
+              "tint": [0.1, 0.1, 0.1, 1]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "arm-joint-left",
+      "translation": [-0.2, 0.5, 0],
+      "rotation": [0, -1.5, 0],
+      "children": [
+        {
+          "name": "arm-left",
+          "scale": [0.1, 0.1, 0.5],
+          "mesh": "rod"
+        },
+        {
+          "name": "forearm-joint-left",
+          "translation": [0, 0, 0.5],
+          "children": [
+            {
+              "name": "forearm-left",
+              "scale": [0.1, 0.1, 0.5],
+              "mesh": "rod"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "arm-joint-right",
+      "translation": [0.2, 0.5, 0],
+      "rotation": [0, 1.5, 0],
+      "children": [
+        {
+          "name": "arm-right",
+          "scale": [0.1, 0.1, 0.5],
+          "mesh": "rod"
+        },
+        {
+          "name": "forearm-joint-right",
+          "translation": [0, 0, 0.5],
+          "children": [
+            {
+              "name": "forearm-right",
+              "scale": [0.1, 0.1, 0.5],
+              "mesh": "rod"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "upper-leg-joint-left",
+      "translation": [-0.2, -0.5, 0],
+      "rotation": [1.5, 0, 0],
+      "children": [
+        {
+          "name": "upper-leg-left",
+          "scale": [0.1, 0.1, 0.5],
+          "mesh": "rod"
+        },
+        {
+          "name": "lower-leg-joint-left",
+          "translation": [0, 0, 0.5],
+          "children": [
+            {
+              "name": "lower-leg-left",
+              "scale": [0.1, 0.1, 0.5],
+              "mesh": "rod"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "upper-leg-joint-right",
+      "translation": [0.2, -0.5, 0],
+      "rotation": [1.5, 0, 0],
+      "children": [
+        {
+          "name": "upper-leg-right",
+          "scale": [0.1, 0.1, 0.5],
+          "mesh": "rod"
+        },
+        {
+          "name": "lower-leg-joint-right",
+          "translation": [0, 0, 0.5],
+          "children": [
+            {
+              "name": "lower-leg-right",
+              "scale": [0.1, 0.1, 0.5],
+              "mesh": "rod"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
