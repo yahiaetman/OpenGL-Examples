@@ -53,6 +53,27 @@ namespace our {
                 {GL_FRONT_AND_BACK, "GL_FRONT_AND_BACK"}
         };
 
+        inline EnumMap texture_magnification_filters = {
+                {GL_NEAREST, "GL_NEAREST"},
+                {GL_LINEAR, "GL_LINEAR"}
+        };
+
+        inline EnumMap texture_minification_filters = {
+                {GL_NEAREST, "GL_NEAREST"},
+                {GL_LINEAR, "GL_LINEAR"},
+                {GL_NEAREST_MIPMAP_NEAREST, "GL_NEAREST_MIPMAP_NEAREST"},
+                {GL_LINEAR_MIPMAP_NEAREST, "GL_LINEAR_MIPMAP_NEAREST"},
+                {GL_NEAREST_MIPMAP_LINEAR, "GL_NEAREST_MIPMAP_LINEAR"},
+                {GL_LINEAR_MIPMAP_LINEAR, "GL_LINEAR_MIPMAP_LINEAR"}
+        };
+
+        inline EnumMap texture_wrapping_modes = {
+                {GL_CLAMP_TO_EDGE, "GL_CLAMP_TO_EDGE"},
+                {GL_CLAMP_TO_BORDER, "GL_MIRRORED_REPEAT"},
+                {GL_REPEAT, "GL_REPEAT"},
+                {GL_MIRRORED_REPEAT, "GL_MIRRORED_REPEAT"},
+                {GL_MIRROR_CLAMP_TO_EDGE, "GL_MIRROR_CLAMP_TO_EDGE"}
+        };
     }
 
     template<typename T>

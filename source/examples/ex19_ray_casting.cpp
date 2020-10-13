@@ -58,7 +58,8 @@ class RayCastingApplication : public our::Application {
         model.getElementData(model_elements);
         model.getVertexData(0, model_vertices);
 
-        rays.create({our::setup_buffer_accessors<our::ColoredVertex>});
+        rays.create({our::setup_buffer_accessors<our::ColoredVertex>}, false);
+        rays.setPrimitiveMode(GL_LINES);
 
         std::mt19937_64 random_generator(1234);
         std::uniform_real_distribution y_generator(1.0f, 5.0f);
@@ -146,8 +147,9 @@ class RayCastingApplication : public our::Application {
             ray_elements.push_back(ray_vertices.size() + 1);
             ray_vertices.push_back({ ray_origin, {255, 196, 128, 255}});
             ray_vertices.push_back({ nearest_hit_point, {196, 128, 255, 255}});
-            rays.setElementData(ray_elements, GL_DYNAMIC_DRAW);
+            //rays.setElementData(ray_elements, GL_DYNAMIC_DRAW);
             rays.setVertexData(0, ray_vertices, GL_DYNAMIC_DRAW);
+            rays.setVertexCount(ray_vertices.size());
         }
 
         glUseProgram(program);
@@ -165,7 +167,7 @@ class RayCastingApplication : public our::Application {
 
         program.set("tint", glm::vec4(1, 1, 1, 1));
         program.set("transform", camera.getVPMatrix());
-        rays.draw(GL_LINES);
+        rays.draw();
     }
 
     void onDestroy() override {

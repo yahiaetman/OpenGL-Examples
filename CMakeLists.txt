@@ -26,7 +26,7 @@ set(VENDOR_SOURCES ${GLAD_SOURCE} ${IMGUI_SOURCES})
 #target_link_libraries(vendor_libs glfw)
 
 set(COMMON_SOURCES
-        source/common/application.cpp source/common/shader.cpp source/common/mesh/mesh-utils.cpp)
+        source/common/application.cpp source/common/shader.cpp source/common/mesh/mesh-utils.cpp source/common/texture/texture-utils.cpp)
 
 include_directories(
         source/common
@@ -96,3 +96,6 @@ target_link_libraries(EX19_RAY_CASTING glfw)
 
 add_executable(EX20_SCENE_GRAPHS source/examples/ex20_scene_graphs.cpp ${COMMON_SOURCES} ${VENDOR_SOURCES})
 target_link_libraries(EX20_SCENE_GRAPHS glfw)
+
+add_executable(EX21_TEXTURE source/examples/ex21_texture.cpp ${COMMON_SOURCES} ${VENDOR_SOURCES})
+target_link_libraries(EX21_TEXTURE glfw)
