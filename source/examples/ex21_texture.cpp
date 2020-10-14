@@ -2,39 +2,19 @@
 #include <shader.hpp>
 #include <imgui-utils/utils.hpp>
 
-#include <mesh/mesh.hpp>
 #include <texture/texture-utils.h>
-#include <camera/camera.hpp>
-#include <camera/controllers/fly_camera_controller.hpp>
 
-#include <glm/gtx/euler_angles.hpp>
-
-struct Vertex {
-    glm::vec3 position;
-    glm::vec<4, glm::uint8, glm::defaultp> color;
-    glm::vec2 tex_coord;
-};
+#include <unordered_map>
 
 class TextureApplication : public our::Application {
 
     our::ShaderProgram program;
-    our::Mesh model;
+    GLuint vertex_array;
 
-    std::vector<Vertex> vertices = {
-            {{-0.5, -0.5, 0.0},{255, 255, 255, 255}, {0, 0}},
-            {{0.5, -0.5, 0.0},{255, 255, 255, 255}, {1, 0}},
-            {{0.5, 0.5, 0.0},{255, 255, 255, 255}, {1, 1}},
-            {{-0.5, 0.5, 0.0},{255, 255, 255, 255}, {0, 1}}
-    };
-    std::vector<uint16_t> elements = { 0, 1, 2, 2, 3, 0 };
-
-    GLuint texture;
-    GLenum magnification_filter = GL_NEAREST, minification_filter = GL_NEAREST;
-    GLenum wrap_s = GL_CLAMP_TO_EDGE, wrap_t = GL_CLAMP_TO_EDGE;
-    glm::vec4 border_color = {1,1,1,1};
-
-    our::Camera camera;
-    our::FlyCameraController camera_controller;
+    std::unordered_map<std::string, GLuint> textures;
+    std::string current_texture_name;
+    int level_of_detail = 0;
+    float zoom = 1;
 
     our::WindowConfiguration getWindowConfiguration() override {
         return { "Textures", {1280, 720}, false };
@@ -42,114 +22,151 @@ class TextureApplication : public our::Application {
 
     void onInitialize() override {
         program.create();
-        program.attach("assets/shaders/ex21_texture/transform.vert", GL_VERTEX_SHADER);
-        program.attach("assets/shaders/ex21_texture/texture.frag", GL_FRAGMENT_SHADER);
+        program.attach("assets/shaders/ex21_texture/fullscreen_triangle.vert", GL_VERTEX_SHADER);
+        program.attach("assets/shaders/ex21_texture/texel_fetch.frag", GL_FRAGMENT_SHADER);
         program.link();
 
-        model.create({
-           [](){
-               glEnableVertexAttribArray(0);
-               glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(Vertex), (void*)offsetof(Vertex, position));
-               glEnableVertexAttribArray(1);
-               glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, true, sizeof(Vertex), (void*)offsetof(Vertex, color));
-               glEnableVertexAttribArray(2);
-               glVertexAttribPointer(2, 2, GL_FLOAT, false, sizeof(Vertex), (void*)offsetof(Vertex, tex_coord));
-           }
-        });
+        glGenVertexArrays(1, &vertex_array);
+
+        GLuint texture;
+
+        {
+            glGenTextures(1, &texture);
+            using color = glm::vec<4, glm::uint8, glm::defaultp>;
+            const color W = {255, 255, 255, 255}, Y = {255, 255, 0, 255},
+                    B = {0, 0, 0, 255};
+            color pixel_data[] = {
+                    W, W, Y, Y, Y, Y, W, W,
+                    W, Y, Y, B, B, Y, Y, W,
+                    Y, Y, B, Y, Y, B, Y, Y,
+                    Y, Y, Y, Y, Y, Y, Y, Y,
+                    Y, Y, B, Y, Y, B, Y, Y,
+                    Y, Y, B, Y, Y, B, Y, Y,
+                    W, Y, Y, Y, Y, Y, Y, W,
+                    W, W, Y, Y, Y, Y, W, W,
+            };
+            glBindTexture(GL_TEXTURE_2D, texture);
+            glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 8, 8, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixel_data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
+        textures["smiley"] = texture;
+
+        {
+            glGenTextures(1, &texture);
+            using color = glm::vec<3, glm::uint8, glm::defaultp>;
+            const color W = {255, 255, 255}, R = {255, 0, 0};
+            color pixel_data[] = {
+                    W, W, W, W, W,
+                    W, W, R, W, W,
+                    W, R, R, R, W,
+                    W, W, R, W, W,
+                    W, W, W, W, W,
+            };
+            glBindTexture(GL_TEXTURE_2D, texture);
+            glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, 5, 5, 0, GL_RGB, GL_UNSIGNED_BYTE, pixel_data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
+        textures["cross"] = texture;
+
+        {
+            glGenTextures(1, &texture);
+            const GLuint width = 256, height = 128, tile_size = 32;
+            float pixel_data[width * height];
+            GLuint index = 0;
+            for(GLuint y = 0; y < height; ++y){
+                for(GLuint x = 0; x < width; ++x){
+                    auto tile_coord = 2.0f * glm::fract(glm::vec2(x,y)/static_cast<float>(tile_size)) - 1.0f;
+                    auto length2 = glm::dot(tile_coord, tile_coord);
+                    pixel_data[index++] = length2 > 1 ? 0.0f : glm::sqrt(1.0f - length2);
+                }
+            }
+            glBindTexture(GL_TEXTURE_2D, texture);
+            glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, width, height, 0, GL_RED, GL_FLOAT, pixel_data);
+            //If you want the texture to look grayscale, you can swizzling to rewire the green & blue channels to read their value from the red channel.
+            // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_RED);
+            // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
+        textures["bubbles"] = texture;
 
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/images/ex21_texture/color-grid.png");
+        our::texture_utils::loadImage(texture, "assets/images/common/color-grid.png");
+        textures["color-grid"] = texture;
 
-        int width, height;
-        glfwGetFramebufferSize(window, &width, &height);
+        glGenTextures(1, &texture);
+        our::texture_utils::loadImage(texture, "assets/images/common/moon.jpg");
+        textures["moon"] = texture;
 
-        camera.setEyePosition({0, 0, 1});
-        camera.setTarget({0, 0, 0});
-        camera.setUp({0, 1, 0});
-        camera.setupPerspective(glm::pi<float>()/2, static_cast<float>(width)/height, 0.1f, 100.0f);
-
-        camera_controller.initialize(this, &camera);
-
-        glClearColor(0, 0, 0, 0);
+        current_texture_name = "color-grid";
 
         glClearColor(0, 0, 0, 1);
     }
 
     void onDraw(double deltaTime) override {
-        camera_controller.update(deltaTime);
-
-        model.setVertexData(0, vertices, GL_STREAM_DRAW);
-        model.setElementData( elements, GL_STREAM_DRAW);
-
         glUseProgram(program);
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT);
 
-        program.set("tint", glm::vec4(1, 1, 1, 1));
-
-        program.set("transform", camera.getVPMatrix());
+        GLuint texture = textures[current_texture_name];
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
         program.set("sampler", 0);
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magnification_filter);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minification_filter);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_s);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_t);
-        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, glm::value_ptr(border_color));
+        program.set("lod", level_of_detail);
+        program.set("zoom", zoom);
 
-        model.draw();
-
+        glBindVertexArray(vertex_array);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glBindVertexArray(0);
     }
 
     void onDestroy() override {
         program.destroy();
-        model.destroy();
+        glDeleteVertexArrays(1, &vertex_array);
+        for(const auto& [name, texture] : textures)
+            glDeleteTextures(1, &texture);
+        textures.clear();
     }
 
     void onImmediateGui(ImGuiIO &io) override {
-
         ImGui::Begin("Controls");
-        GLenum primitive_mode = model.getPrimitiveMode();
-        our::OptionMapCombo("Primitive Type", primitive_mode, our::gl_enum_options::primitives);
-        model.setPrimitiveMode(primitive_mode);
 
-        bool use_elements = model.isUsingElements();
-        ImGui::Checkbox("Use Elements", &use_elements);
-        model.setUseElements(use_elements);
+        if(ImGui::BeginCombo("Texture", current_texture_name.c_str())){
+            for(const auto& [name, texture]: textures){
+                bool selected = current_texture_name == name;
+                if(ImGui::Selectable(name.c_str(), selected))
+                    current_texture_name = name;
+                if(selected) ImGui::SetItemDefaultFocus();
+            }
+            ImGui::EndCombo();
+        }
 
-        our::OptionMapCombo("Magnification Filter", magnification_filter, our::gl_enum_options::texture_magnification_filters);
-        our::OptionMapCombo("Minification Filter", minification_filter, our::gl_enum_options::texture_minification_filters);
-        our::OptionMapCombo("Wrap S", wrap_s, our::gl_enum_options::texture_wrapping_modes);
-        our::OptionMapCombo("Wrap T", wrap_t, our::gl_enum_options::texture_wrapping_modes);
-        ImGui::ColorEdit4("Border Color", glm::value_ptr(border_color));
-        ImGui::End();
+        GLuint texture = textures[current_texture_name];
 
-        ImGui::Begin("Vertices");
-        our::ReorderableList(std::begin(vertices), std::end(vertices),
-                             [](size_t index, Vertex& vertex){
-                                 ImGui::Text("Vertex %zu", index);
-                                 ImGui::DragFloat3("Position", glm::value_ptr(vertex.position), 0.01);
-                                 our::ColorEdit4U8("Color", glm::value_ptr(vertex.color));
-                                 ImGui::DragFloat2("Texture Coordinates", glm::value_ptr(vertex.tex_coord));
-                             },
-                             [&](size_t index){ vertices.insert(std::begin(vertices) + index, Vertex()); },
-                             [&](size_t index){ vertices.erase(std::begin(vertices) + index); });
-        ImGui::End();
+        GLint width, height;
 
-        ImGui::Begin("Elements");
-        int max_element = (int)vertices.size() - 1;
-        float speed = 1.0f / (float)(max_element + 1);
-        our::ReorderableList(std::begin(elements), std::end(elements),
-                             [&](size_t index, uint16_t & element){
-                                 std::string str_id = std::to_string(index);
-                                 int element_i32 = element;
-                                 ImGui::DragInt(str_id.c_str(), &element_i32, speed, 0, max_element);
-                                 element = element_i32;
-                             },
-                             [&](size_t index){ elements.insert(std::begin(elements) + index, 0); },
-                             [&](size_t index){ elements.erase(std::begin(elements) + index); });
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
+        glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &height);
+
+        GLint mipmap_levels = glm::floor(glm::log2(static_cast<float>(glm::max(width, height)))) + 1;
+
+        ImGui::Text("Original Size: %i x %i (mip levels: %i)", width, height, mipmap_levels);
+
+        if(level_of_detail >= mipmap_levels) level_of_detail = mipmap_levels - 1;
+
+        ImGui::DragInt("Level of Detail", &level_of_detail, 1.0f, 0, mipmap_levels-1);
+
+        glGetTexLevelParameteriv(GL_TEXTURE_2D, level_of_detail, GL_TEXTURE_WIDTH, &width);
+        glGetTexLevelParameteriv(GL_TEXTURE_2D, level_of_detail, GL_TEXTURE_HEIGHT, &height);
+        ImGui::Text("Current LOD Size: %i x %i", width, height);
+
+        ImGui::DragFloat("Zoom", &zoom, 0.1f, 0, 1000.0f);
+
         ImGui::End();
     }
 

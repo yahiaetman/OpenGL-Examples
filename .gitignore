@@ -1,5 +1,5 @@
 # build directories
-cmake-build-debug*/
+cmake-build-*/
 build/
 
 # imgui saved state

@@ -212,3 +212,44 @@ void our::mesh_utils::Sphere(our::Mesh& mesh, const glm::ivec2& segments, bool c
     mesh.setVertexData(0, vertices);
     mesh.setElementData(elements);
 }
+
+void our::mesh_utils::Plane(our::Mesh& mesh, const glm::ivec2& resolution, bool colored,
+           const glm::vec3& center, const glm::vec2& size,
+           const glm::vec2& texture_offset, const glm::vec2& texture_tiling){
+    std::vector<our::Vertex> vertices;
+    std::vector<GLuint> elements;
+
+    glm::ivec2 it; glm::vec3 position = {0, center.y, 0}; glm::vec2 uv;
+    for(it.x = 0; it.x <= resolution.x; it.x++){
+        uv.s = ((float)it.x) / resolution.x;
+        position.x = size.x * (uv.s - 0.5f) + center.x;
+        for(it.y = 0; it.y <= resolution.y; it.y++){
+            uv.t = ((float)it.y) / resolution.y;
+            position.z = size.y * (uv.t - 0.5f) + center.z;
+            glm::vec2 tex_coord = uv * texture_tiling + texture_offset;
+            our::Color color = colored ? glm::mix(
+                    glm::mix(our::Color(255, 0, 0, 255), our::Color(0, 255, 0, 255), uv.s),
+                    glm::mix(our::Color(255, 255, 0, 255), our::Color(0, 0, 255, 255), uv.s),
+                    uv.t) : WHITE;
+            vertices.push_back({position, color, tex_coord, {0, 1, 0}});
+        }
+    }
+
+    GLuint index = resolution.y + 1;
+    for(it.x = 0; it.x < resolution.x; it.x++){
+        index++;
+        for(it.y = 0; it.y < resolution.y; it.y++){
+            elements.push_back(index);
+            elements.push_back(index - 1);
+            elements.push_back(index - 1 - (resolution.x+1));
+            elements.push_back(index - 1 - (resolution.x+1));
+            elements.push_back(index - (resolution.x+1));
+            elements.push_back(index);
+            index++;
+        }
+    }
+
+    mesh.create({our::setup_buffer_accessors<Vertex>});
+    mesh.setVertexData(0, vertices);
+    mesh.setElementData(elements);
+}

@@ -6,9 +6,9 @@
 #include <glm/vec2.hpp>
 #include <glm/gtx/hash.hpp>
 
-namespace our {
+#include <data-types.h>
 
-    typedef glm::vec<4, uint8_t, glm::defaultp> Color;
+namespace our {
 
     struct ColoredVertex {
         glm::vec3 position;

@@ -18,7 +18,7 @@ namespace our {
         float yaw, pitch;
         glm::vec3 position;
 
-        float yaw_sensitivity, pitch_sensitivity;
+        float yaw_sensitivity, pitch_sensitivity, fov_sensitivity;
         glm::vec3 position_sensitivity;
         float speedup_factor = 5.0f;
 
@@ -30,6 +30,7 @@ namespace our {
             this->camera = camera;
             yaw_sensitivity = pitch_sensitivity = 0.01f;
             position_sensitivity = {3.0f, 3.0f, 3.0f};
+            fov_sensitivity = glm::pi<float>()/10;
 
             position = camera->getEyePosition();
             auto direction = camera->getDirection();
@@ -57,12 +58,16 @@ namespace our {
             if(app->getMouse().isPressed(GLFW_MOUSE_BUTTON_1)){
                 glm::vec2 delta = app->getMouse().getMouseDelta();
                 pitch -= delta.y * pitch_sensitivity;
-                yaw += delta.x * yaw_sensitivity;
+                yaw -= delta.x * yaw_sensitivity;
             }
 
             if(pitch < -glm::half_pi<float>() * 0.99f) pitch = -glm::half_pi<float>() * 0.99f;
             if(pitch >  glm::half_pi<float>() * 0.99f) pitch  = glm::half_pi<float>() * 0.99f;
             yaw = glm::wrapAngle(yaw);
+
+            float fov = camera->getVerticalFieldOfView() + app->getMouse().getScrollOffset().y * fov_sensitivity;
+            fov = glm::clamp(fov, glm::pi<float>() * 0.01f, glm::pi<float>() * 0.99f);
+            camera->setVerticalFieldOfView(fov);
 
             glm::vec3 front = camera->Forward(), up = camera->Up(), right = camera->Right();
 
@@ -86,6 +91,7 @@ namespace our {
 
         [[nodiscard]] float getYawSensitivity() const {return yaw_sensitivity;}
         [[nodiscard]] float getPitchSensitivity() const {return pitch_sensitivity;}
+        [[nodiscard]] float getFieldOfViewSensitivity() const {return fov_sensitivity;}
         [[nodiscard]] glm::vec3 getPositionSensitivity() const {return position_sensitivity;}
         [[nodiscard]] float getSpeedUpFactor() const {return speedup_factor;}
 
@@ -104,6 +110,7 @@ namespace our {
 
         void setYawSensitivity(float sensitivity){this->yaw_sensitivity = sensitivity;}
         void setPitchSensitivity(float sensitivity){this->pitch_sensitivity = sensitivity;}
+        void setFieldOfViewSensitivity(float sensitivity){this->fov_sensitivity = sensitivity;}
         void setPositionSensitivity(glm::vec3 sensitivity){this->position_sensitivity = sensitivity;}
 
     };

@@ -20,6 +20,13 @@ namespace our::mesh_utils {
                 float radius = 0.5f,
                 const glm::vec2& texture_offset = {0, 0},
                 const glm::vec2& texture_tiling = {1, 1});
+    void Plane(our::Mesh& mesh,
+               const glm::ivec2& resolution = {1, 1},
+               bool colored = false,
+               const glm::vec3& center={0, 0, 0},
+               const glm::vec2& size={1, 1},
+               const glm::vec2& texture_offset = {0, 0},
+               const glm::vec2& texture_tiling = {1, 1});
 
 }
 

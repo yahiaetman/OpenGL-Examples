@@ -91,8 +91,6 @@ class SceneGraphApplication : public our::Application {
         roots["human"] = loadSceneGraph("assets/data/ex20_scene_graphs/human.json");
         current_root_name = "simple";
 
-        glClearColor(0, 0, 0, 0);
-
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
 

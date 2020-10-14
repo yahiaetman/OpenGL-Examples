@@ -69,7 +69,7 @@ namespace our {
 
         inline EnumMap texture_wrapping_modes = {
                 {GL_CLAMP_TO_EDGE, "GL_CLAMP_TO_EDGE"},
-                {GL_CLAMP_TO_BORDER, "GL_MIRRORED_REPEAT"},
+                {GL_CLAMP_TO_BORDER, "GL_CLAMP_TO_BORDER"},
                 {GL_REPEAT, "GL_REPEAT"},
                 {GL_MIRRORED_REPEAT, "GL_MIRRORED_REPEAT"},
                 {GL_MIRROR_CLAMP_TO_EDGE, "GL_MIRROR_CLAMP_TO_EDGE"}

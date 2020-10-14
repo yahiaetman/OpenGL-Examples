@@ -7,7 +7,9 @@
 #include <imgui_impl/imgui_impl_glfw.h>
 #include <imgui_impl/imgui_impl_opengl3.h>
 
-//#define ENABLE_OPENGL_DEBUG_MESSAGES
+#if !defined(NDEBUG)
+#define ENABLE_OPENGL_DEBUG_MESSAGES
+#endif
 
 void glfw_error_callback(int error, const char* description){
     std::cerr << "GLFW Error: " << error << ": " << description << std::endl;
@@ -67,7 +69,7 @@ void GLAPIENTRY opengl_callback(GLenum source, GLenum type, GLuint id, GLenum se
     }
 
     std::cout << "OpenGL Debug Message " << id << " (type: " << _type << ") of " << _severity
-    << " raised from " << _source << message << std::endl;
+    << " raised from " << _source << ": " << message << std::endl;
 }
 
 void our::Application::configureOpenGL() {
@@ -165,8 +167,6 @@ int our::Application::run() {
 
         onImmediateGui(io);
 
-        //std::cout << io.WantCaptureKeyboard << ", " << io.WantCaptureMouse << std::endl;
-
         keyboard.setEnabled(!io.WantCaptureKeyboard, window);
         mouse.setEnabled(!io.WantCaptureMouse, window);
 
@@ -181,7 +181,15 @@ int our::Application::run() {
 
         last_frame_time = current_frame_time;
 
+#if defined(ENABLE_OPENGL_DEBUG_MESSAGES)
+        glDisable(GL_DEBUG_OUTPUT);
+        glDisable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+#endif
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+#if defined(ENABLE_OPENGL_DEBUG_MESSAGES)
+        glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+#endif
 
         glfwSwapBuffers(window);
 

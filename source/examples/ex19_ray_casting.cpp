@@ -42,7 +42,7 @@ class RayCastingApplication : public our::Application {
 
     std::vector<our::Vertex> model_vertices;
     std::vector<our::ColoredVertex> ray_vertices;
-    std::vector<GLuint> model_elements, ray_elements;
+    std::vector<GLuint> model_elements;
 
     our::WindowConfiguration getWindowConfiguration() override {
         return { "Ray Casting", {1280, 720}, false };
@@ -143,11 +143,8 @@ class RayCastingApplication : public our::Application {
         }
 
         if(mouse.justPressed(1)){
-            ray_elements.push_back(ray_vertices.size());
-            ray_elements.push_back(ray_vertices.size() + 1);
             ray_vertices.push_back({ ray_origin, {255, 196, 128, 255}});
             ray_vertices.push_back({ nearest_hit_point, {196, 128, 255, 255}});
-            //rays.setElementData(ray_elements, GL_DYNAMIC_DRAW);
             rays.setVertexData(0, ray_vertices, GL_DYNAMIC_DRAW);
             rays.setVertexCount(ray_vertices.size());
         }
