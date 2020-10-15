@@ -115,3 +115,6 @@ target_link_libraries(EX25_BLENDING glfw)
 
 add_executable(EX26_FRAME_BUFFER source/examples/ex26_frame_buffer.cpp ${COMMON_SOURCES} ${VENDOR_SOURCES})
 target_link_libraries(EX26_FRAME_BUFFER glfw)
+
+add_executable(EX27_POSTPROCESSING source/examples/ex27_postprocessing.cpp ${COMMON_SOURCES} ${VENDOR_SOURCES})
+target_link_libraries(EX27_POSTPROCESSING glfw)
