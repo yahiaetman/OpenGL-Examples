@@ -237,12 +237,9 @@ class MultipleRenderTargetsApplication : public our::Application {
         };
         glDrawBuffers(3, draw_buffers);
 
-        GLfloat clear_color0[] = {0.88f, 0.65f, 0.15f, 1.0f};
-        glClearBufferfv(GL_COLOR, 0, clear_color0);
-        GLfloat clear_color1[] = {0.0f, 0.0f};
-        glClearBufferfv(GL_COLOR, 1, clear_color1);
-        GLfloat clear_color2[] = {0.0f, 0.0f};
-        glClearBufferfv(GL_COLOR, 2, clear_color2);
+        glClearBufferfv(GL_COLOR, 0, glm::value_ptr(glm::vec4(0.88f, 0.65f, 0.15f, 1.0f)));
+        glClearBufferfv(GL_COLOR, 1, glm::value_ptr(glm::vec2(0.0f, 0.0f)));
+        glClearBufferfv(GL_COLOR, 2, glm::value_ptr(glm::vec2(0.0f, 0.0f)));
         glClearBufferfi(GL_DEPTH_STENCIL, 0, 1.0f, 0);
 
         drawNode(root, camera.getVPMatrix());
