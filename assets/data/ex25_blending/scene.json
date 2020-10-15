@@ -1,0 +1,63 @@
+{
+  "children": {
+    "ground": {
+      "mesh": "plane",
+      "scale": [500, 1, 500],
+      "texture": "checkerboard",
+      "tint": [0.96, 0.9, 0.64, 1]
+    },
+    "glass-panels": {
+      "mesh": "cube",
+      "texture": "glass-panels",
+      "transparent": true,
+      "translation": [-4, 1, 0],
+      "scale": [2, 2, 2]
+    },
+    "metal": {
+      "mesh": "cube",
+      "texture": "metal",
+      "transparent": true,
+      "translation": [0, 1, 4],
+      "scale": [2, 2, 2]
+    },
+    "fog": {
+      "mesh": "cube",
+      "texture": "fog",
+      "transparent": true,
+      "translation": [4, 1, 0],
+      "scale": [2, 2, 2]
+    },
+    "constant": {
+      "mesh": "cube",
+      "texture": "white",
+      "tint": [0, 0, 1, 0.5],
+      "transparent": true,
+      "translation": [0, 1, -4],
+      "scale": [2, 2, 2]
+    },
+    "color-grid": {
+      "mesh": "cube",
+      "texture": "color-grid",
+      "translation": [0, 1, 0],
+      "scale": [2, 2, 2]
+    },
+    "crossed-1": {
+      "mesh": "cube",
+      "texture": "color-grid",
+      "transparent": true,
+      "tint": [1, 1, 1, 0.5],
+      "translation": [10, 1, 0],
+      "scale": [0.1, 2, 10],
+      "rotation": [0, 1, 0]
+    },
+    "crossed-2": {
+      "mesh": "cube",
+      "texture": "moon",
+      "transparent": true,
+      "tint": [1, 1, 1, 0.5],
+      "translation": [12, 1, 0],
+      "scale": [0.1, 2, 10],
+      "rotation": [0, -1, 0]
+    }
+  }
+}

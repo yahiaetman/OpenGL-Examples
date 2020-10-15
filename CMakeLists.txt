@@ -106,3 +106,12 @@ target_link_libraries(EX22_TEXTURE_SAMPLING glfw)
 
 add_executable(EX23_SAMPLER_OBJECTS source/examples/ex23_sampler_objects.cpp ${COMMON_SOURCES} ${VENDOR_SOURCES})
 target_link_libraries(EX23_SAMPLER_OBJECTS glfw)
+
+add_executable(EX24_DISPLACEMENT source/examples/ex24_displacement.cpp ${COMMON_SOURCES} ${VENDOR_SOURCES})
+target_link_libraries(EX24_DISPLACEMENT glfw)
+
+add_executable(EX25_BLENDING source/examples/ex25_blending.cpp ${COMMON_SOURCES} ${VENDOR_SOURCES})
+target_link_libraries(EX25_BLENDING glfw)
+
+add_executable(EX26_FRAME_BUFFER source/examples/ex26_frame_buffer.cpp ${COMMON_SOURCES} ${VENDOR_SOURCES})
+target_link_libraries(EX26_FRAME_BUFFER glfw)

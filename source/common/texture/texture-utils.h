@@ -11,6 +11,7 @@
 namespace our::texture_utils {
 
     glm::ivec2 loadImage(GLuint texture, const char* filename, bool generate_mipmap = true);
+    glm::ivec2 loadImageGrayscale(GLuint texture, const char* filename, bool generate_mipmap = true);
 
     void singleColor(GLuint texture, Color color={255,255,255,255}, glm::ivec2 size={1,1});
 

@@ -40,6 +40,23 @@ glm::ivec2 our::texture_utils::loadImage(GLuint texture, const char *filename, b
     return size;
 }
 
+glm::ivec2 our::texture_utils::loadImageGrayscale(GLuint texture, const char *filename, bool generate_mipmap) {
+    glm::ivec2 size;
+    int channels;
+    stbi_set_flip_vertically_on_load(true);
+    unsigned char* data = stbi_load(filename, &size.x, &size.y, &channels, 1);
+    if(data == nullptr){
+        std::cerr << "Failed to load image: " << filename << std::endl;
+        return {0, 0};
+    }
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, size.x, size.y, 0, GL_RED, GL_UNSIGNED_BYTE, data);
+    if(generate_mipmap) glGenerateMipmap(GL_TEXTURE_2D);
+    stbi_image_free(data);
+    return size;
+}
+
 void our::texture_utils::singleColor(GLuint texture, our::Color color, glm::ivec2 size){
     //Allocate array for texture data
     auto* data = new Color[size.x * size.y];

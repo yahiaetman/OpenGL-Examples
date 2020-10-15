@@ -1,0 +1,8 @@
+The Heightmaps:
+- Heighmap_Billow.png
+- Heighmap_Island.png
+- Heighmap_Mountain.png
+- Heighmap_Plateau.png
+- Heighmap_Rock.png
+were downloaded from: https://fools-errand.itch.io/5-free-terrain-heightmaps
+

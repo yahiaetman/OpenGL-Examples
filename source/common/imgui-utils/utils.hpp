@@ -74,6 +74,31 @@ namespace our {
                 {GL_MIRRORED_REPEAT, "GL_MIRRORED_REPEAT"},
                 {GL_MIRROR_CLAMP_TO_EDGE, "GL_MIRROR_CLAMP_TO_EDGE"}
         };
+
+        inline EnumMap blend_functions = {
+                {GL_ZERO, "GL_ZERO"},
+                {GL_ONE, "GL_ONE"},
+                {GL_SRC_COLOR, "GL_SRC_COLOR"},
+                {GL_ONE_MINUS_SRC_COLOR, "GL_ONE_MINUS_SRC_COLOR"},
+                {GL_DST_COLOR, "GL_DST_COLOR"},
+                {GL_ONE_MINUS_DST_COLOR, "GL_ONE_MINUS_DST_COLOR"},
+                {GL_SRC_ALPHA, "GL_SRC_ALPHA"},
+                {GL_ONE_MINUS_SRC_ALPHA, "GL_ONE_MINUS_SRC_ALPHA"},
+                {GL_DST_ALPHA, "GL_DST_ALPHA"},
+                {GL_ONE_MINUS_DST_ALPHA, "GL_ONE_MINUS_DST_ALPHA"},
+                {GL_CONSTANT_COLOR, "GL_CONSTANT_COLOR"},
+                {GL_ONE_MINUS_CONSTANT_COLOR, "GL_ONE_MINUS_CONSTANT_COLOR"},
+                {GL_CONSTANT_ALPHA, "GL_CONSTANT_ALPHA"},
+                {GL_ONE_MINUS_CONSTANT_ALPHA, "GL_ONE_MINUS_CONSTANT_ALPHA"}
+        };
+
+        inline EnumMap blend_equations = {
+                {GL_FUNC_ADD, "GL_FUNC_ADD"},
+                {GL_FUNC_SUBTRACT, "GL_FUNC_SUBTRACT"},
+                {GL_FUNC_REVERSE_SUBTRACT, "GL_FUNC_REVERSE_SUBTRACT"},
+                {GL_MIN, "GL_MIN"},
+                {GL_MAX, "GL_MAX"}
+        };
     }
 
     template<typename T>

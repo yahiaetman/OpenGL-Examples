@@ -48,7 +48,7 @@ struct Transform {
     }
 };
 
-class SamplerObjectsApplication : public our::Application {
+class FrameBufferApplication : public our::Application {
 
     our::ShaderProgram program;
 
@@ -58,20 +58,19 @@ class SamplerObjectsApplication : public our::Application {
 
     GLuint sampler;
 
-    GLenum magnification_filter = GL_LINEAR, minification_filter = GL_LINEAR_MIPMAP_LINEAR;
-    GLenum wrap_s = GL_REPEAT, wrap_t = GL_REPEAT;
-    glm::vec4 border_color = {1,1,1,1};
-    GLfloat max_anisotropy = 1.0f;
+    std::shared_ptr<Transform> root, internal_root;
 
-    GLenum polygon_mode = GL_FILL;
+    our::Camera camera, internal_camera;
+    our::FlyCameraController camera_controller, internal_camera_controller;
 
-    std::shared_ptr<Transform> root;
+    bool control_internal_camera = false;
 
-    our::Camera camera;
-    our::FlyCameraController camera_controller;
+    GLuint frame_buffer;
+
+    const glm::ivec2 rt_size = {512, 512};
 
     our::WindowConfiguration getWindowConfiguration() override {
-        return { "Sampler Objects", {1280, 720}, false };
+        return { "Frame Buffer", {1280, 720}, false };
     }
 
     void onInitialize() override {
@@ -83,16 +82,24 @@ class SamplerObjectsApplication : public our::Application {
         GLuint texture;
 
         glGenTextures(1, &texture);
-        our::texture_utils::checkerBoard(texture, {256,256}, {128,128}, {255, 255, 255, 255}, {16, 16, 16, 255});
+        our::texture_utils::checkerBoard(texture, {256, 256}, {128, 128}, {255, 255, 255, 255}, {16, 16, 16, 255});
         textures["checkerboard"] = texture;
-
         glGenTextures(1, &texture);
         our::texture_utils::loadImage(texture, "assets/models/House/House.jpeg");
         textures["house"] = texture;
-
         glGenTextures(1, &texture);
         our::texture_utils::loadImage(texture, "assets/images/common/moon.jpg");
         textures["moon"] = texture;
+
+        GLuint rt_levels = glm::floor(glm::log2(glm::max<float>(rt_size.x, rt_size.y))) + 1;
+        glGenTextures(1, &texture);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexStorage2D(GL_TEXTURE_2D, rt_levels, GL_RGBA8, rt_size.x, rt_size.y);
+        textures["color_rt"] = texture;
+        glGenTextures(1, &texture);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT32, rt_size.x, rt_size.y);
+        textures["depth_rt"] = texture;
 
         meshes["house"] = std::make_unique<our::Mesh>();
         our::mesh_utils::loadOBJ(*(meshes["house"]), "assets/models/House/House.obj");
@@ -100,8 +107,15 @@ class SamplerObjectsApplication : public our::Application {
         our::mesh_utils::Plane(*(meshes["plane"]), {1, 1}, false, {0, 0, 0}, {1, 1}, {0, 0}, {100, 100});
         meshes["sphere"] = std::make_unique<our::Mesh>();
         our::mesh_utils::Sphere(*(meshes["sphere"]), {32, 16}, false);
+        meshes["cube"] = std::make_unique<our::Mesh>();
+        our::mesh_utils::Cuboid(*(meshes["cube"]));
 
         glGenSamplers(1, &sampler);
+        glSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glSamplerParameteri(sampler, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glSamplerParameteri(sampler, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glBindSampler(0, sampler);
 
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
@@ -109,16 +123,30 @@ class SamplerObjectsApplication : public our::Application {
         camera.setEyePosition({10, 10, 10});
         camera.setTarget({0, 0, 0});
         camera.setUp({0, 1, 0});
-        camera.setupPerspective(glm::pi<float>()/2, static_cast<float>(width)/height, 0.1f, 100.0f);
+        camera.setupPerspective(glm::pi<float>() / 2, static_cast<float>(width) / height, 0.1f, 100.0f);
 
         camera_controller.initialize(this, &camera);
-        camera_controller.setFieldOfViewSensitivity(0.05f );
 
-        std::ifstream file_in("assets/data/ex23_sampler_objects/scene.json");
-        nlohmann::json json;
-        file_in >> json;
-        file_in.close();
-        root = loadNode(json);
+        internal_camera.setEyePosition({10, 10, 10});
+        internal_camera.setTarget({0, 0, 0});
+        internal_camera.setUp({0, 1, 0});
+        internal_camera.setupPerspective(glm::pi<float>() / 2, static_cast<float>(rt_size.x) / rt_size.y, 0.1f, 100.0f);
+
+        internal_camera_controller.initialize(this, &internal_camera);
+
+        root = loadSceneGraph("assets/data/ex26_frame_buffer/external.json");
+        internal_root = loadSceneGraph("assets/data/ex23_sampler_objects/scene.json");
+
+        glGenFramebuffers(1, &frame_buffer);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame_buffer);
+        glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textures["color_rt"], 0);
+        glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, textures["depth_rt"], 0);
+
+        if (glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
+            std::cerr << "Frame buffer is incomplete" << std::endl;
+        }
+
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
@@ -126,8 +154,6 @@ class SamplerObjectsApplication : public our::Application {
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
         glFrontFace(GL_CCW);
-
-        glClearColor(0.88,0.65,0.15, 1);
     }
 
     std::shared_ptr<Transform> loadNode(const nlohmann::json& json){
@@ -151,6 +177,14 @@ class SamplerObjectsApplication : public our::Application {
         return node;
     }
 
+    std::shared_ptr<Transform> loadSceneGraph(const std::string& filename){
+        std::ifstream file_in(filename);
+        nlohmann::json json;
+        file_in >> json;
+        file_in.close();
+        return loadNode(json);
+    }
+
     void drawNode(const std::shared_ptr<Transform>& node, const glm::mat4& parent_transform_matrix){
         glm::mat4 transform_matrix = parent_transform_matrix * node->to_mat4();
         if(node->mesh.has_value()){
@@ -170,26 +204,38 @@ class SamplerObjectsApplication : public our::Application {
     }
 
     void onDraw(double deltaTime) override {
-        camera_controller.update(deltaTime);
+        if(control_internal_camera)
+            internal_camera_controller.update(deltaTime);
+        else
+            camera_controller.update(deltaTime);
 
         root->children["moon-axis"]->children["moon"]->rotation.y += deltaTime;
+        internal_root->children["moon-axis"]->children["moon"]->rotation.y += deltaTime;
 
         glUseProgram(program);
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         glActiveTexture(GL_TEXTURE0);
-        glBindSampler(0, sampler);
         program.set("sampler", 0);
 
-        glSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER, magnification_filter);
-        glSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER, minification_filter);
-        glSamplerParameteri(sampler, GL_TEXTURE_WRAP_S, wrap_s);
-        glSamplerParameteri(sampler, GL_TEXTURE_WRAP_T, wrap_t);
-        glSamplerParameterfv(sampler, GL_TEXTURE_BORDER_COLOR, glm::value_ptr(border_color));
-        glSamplerParameterf(sampler, GL_TEXTURE_MAX_ANISOTROPY_EXT, max_anisotropy);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame_buffer);
+        glViewport(0, 0, rt_size.x, rt_size.y);
 
-        glPolygonMode(GL_FRONT_AND_BACK, polygon_mode);
+        glClearColor(0.88,0.65,0.15, 1);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        drawNode(internal_root, internal_camera.getVPMatrix());
+
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+        int width, height;
+        glfwGetFramebufferSize(window, &width, &height);
+        glViewport(0, 0, width, height);
+
+        glBindTexture(GL_TEXTURE_2D, textures["color_rt"]);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        glClearColor(0.05,0.1,0.2, 1);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         drawNode(root, camera.getVPMatrix());
     }
@@ -197,6 +243,7 @@ class SamplerObjectsApplication : public our::Application {
     void onDestroy() override {
         program.destroy();
         glDeleteSamplers(1, &sampler);
+        glDeleteFramebuffers(1, &frame_buffer);
         for(auto& [name, texture]: textures){
             glDeleteTextures(1, &texture);
         }
@@ -208,33 +255,15 @@ class SamplerObjectsApplication : public our::Application {
     }
 
     void onImmediateGui(ImGuiIO &io) override {
-
         ImGui::Begin("Controls");
 
-        our::OptionMapCombo("Magnification Filter", magnification_filter, our::gl_enum_options::texture_magnification_filters);
-        our::OptionMapCombo("Minification Filter", minification_filter, our::gl_enum_options::texture_minification_filters);
-        our::OptionMapCombo("Wrap S", wrap_s, our::gl_enum_options::texture_wrapping_modes);
-        our::OptionMapCombo("Wrap T", wrap_t, our::gl_enum_options::texture_wrapping_modes);
-        ImGui::ColorEdit4("Border Color", glm::value_ptr(border_color));
-
-        ImGui::Separator();
-
-        GLfloat max_anisotropy_upper_bound;
-        glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &max_anisotropy_upper_bound);
-        ImGui::DragFloat("Maximum Anisotropy", &max_anisotropy, 0.1f, 1.0f, max_anisotropy_upper_bound);
-        ImGui::Text("Maximum Anisotropy Upper Bound: %f", max_anisotropy_upper_bound);
-
-        ImGui::Separator();
-
-        our::OptionMapCombo("Polygon Mode", polygon_mode, our::gl_enum_options::polygon_modes);
+        ImGui::Checkbox("Control Internal Camera", &control_internal_camera);
 
         ImGui::End();
-
-
     }
 
 };
 
 int main(int argc, char** argv) {
-    return SamplerObjectsApplication().run();
+    return FrameBufferApplication().run();
 }
