@@ -15,6 +15,9 @@
 
 #include <fstream>
 #include <unordered_map>
+#include <algorithm>
+#include <cctype>
+#include <string>
 
 namespace glm {
     template<length_t L, typename T, qualifier Q>
@@ -84,10 +87,44 @@ struct Light {
     } spot_angle; // Used for Spot Lights only
 };
 
+void from_json(const nlohmann::json& j, Light& l){
+    std::string type_name = j.value("type", "point");
+    std::transform(type_name.begin(), type_name.end(), type_name.begin(), [](char c){ return std::tolower(c); });
+    if(type_name == "directional") l.type = LightType::DIRECTIONAL;
+    else if(type_name == "spot") l.type = LightType::SPOT;
+    else l.type = LightType::POINT;
+    l.color = j.value<glm::vec3>("color", {1,1,1});
+    l.direction = j.value<glm::vec3>("direction", {0, -1, 0});
+    l.position = j.value<glm::vec3>("position", {0,0,0});
+    l.enabled = j.value("enabled", true);
+    if(auto it = j.find("attenuation"); it != j.end()){
+        auto& a = it.value();
+        l.attenuation.constant = a.value("constant", 0.0f);
+        l.attenuation.linear = a.value("linear", 0.0f);
+        l.attenuation.quadratic = a.value("quadratic", 1.0f);
+    } else {
+        l.attenuation = {0.0f, 0.0f, 1.0f};
+    }
+    if(auto it = j.find("spot_angle"); it != j.end()){
+        auto& a = it.value();
+        l.spot_angle.inner = a.value("inner", glm::quarter_pi<float>());
+        l.spot_angle.outer = a.value("outer", glm::half_pi<float>());
+    } else {
+        l.spot_angle = {glm::quarter_pi<float>(), glm::half_pi<float>()};
+    }
+}
+
 struct SkyLight {
     bool enabled;
     glm::vec3 top_color, middle_color, bottom_color;
 };
+
+void from_json(const nlohmann::json& j, SkyLight& l){
+    l.top_color = j.value<glm::vec3>("top_color", {0,0,0});
+    l.middle_color = j.value<glm::vec3>("middle_color", {0.5,0.5,0.5});
+    l.bottom_color = j.value<glm::vec3>("bottom_color", {1,1,1});
+    l.enabled = j.value("enabled", true);
+}
 
 class TexturedMaterialApplication : public our::Application {
 
@@ -104,6 +141,7 @@ class TexturedMaterialApplication : public our::Application {
 
     std::vector<Light> lights;
     SkyLight sky_light;
+    float sky_box_exposure = 2.0f;
 
     our::WindowConfiguration getWindowConfiguration() override {
         return { "Textured Material", {1280, 720}, false };
@@ -146,7 +184,7 @@ class TexturedMaterialApplication : public our::Application {
         our::texture_utils::checkerBoard(texture, {256,256}, {128,128}, {0, 0, 0, 255}, {255, 255, 255, 255});
         textures["checkerboard_specular"] = texture;
         glGenTextures(1, &texture);
-        our::texture_utils::checkerBoard(texture, {256,256}, {128,128}, {255, 255, 255, 255}, {16, 16, 16, 255});
+        our::texture_utils::checkerBoard(texture, {256,256}, {128,128}, {255, 255, 255, 255}, {64, 64, 64, 255});
         textures["checkerboard_roughness"] = texture;
 
         glGenTextures(1, &texture);
@@ -221,26 +259,11 @@ class TexturedMaterialApplication : public our::Application {
         file_in.close();
         root = loadNode(json);
 
-        Light light = {};
-        light.type = LightType::DIRECTIONAL;
-        light.enabled = true;
-        light.color = {1,1,1};
-        light.direction = {-1, -1, -1};
-        light.position = {0, 1, 5};
-        light.attenuation = {0, 0, 1};
-        light.spot_angle = {glm::pi<float>()/4, glm::pi<float>()/2};
-        lights.push_back(light);
-        light.type = LightType::POINT;
-        lights.push_back(light);
-        light.type = LightType::SPOT;
-        light.direction = {0, 0, 1};
-        light.position = {0, 1, -2};
-        lights.push_back(light);
-
-        sky_light.enabled = true;
-        sky_light.top_color = {0.25, 0.3, 0.5};
-        sky_light.middle_color = {0.35, 0.35, 0.4};
-        sky_light.bottom_color = {0.25, 0.25, 0.25};
+        file_in.open("assets/data/ex32_textured_material/lights.json");
+        file_in >> json;
+        file_in.close();
+        sky_light = json.value("sky", SkyLight());
+        lights = json.value("lights", lights);
 
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
@@ -366,7 +389,7 @@ class TexturedMaterialApplication : public our::Application {
         sky_program.set("sky_light.top_color", sky_light.enabled ? sky_light.top_color : glm::vec3(0.0f));
         sky_program.set("sky_light.middle_color", sky_light.enabled ? sky_light.middle_color : glm::vec3(0.0f));
         sky_program.set("sky_light.bottom_color", sky_light.enabled ? sky_light.bottom_color : glm::vec3(0.0f));
-        sky_program.set("exposure", 2.0f);
+        sky_program.set("exposure", sky_box_exposure);
 
         glCullFace(GL_FRONT);
         meshes["cube"]->draw();
@@ -385,17 +408,16 @@ class TexturedMaterialApplication : public our::Application {
     void displayNodeGui(const std::shared_ptr<Transform>& node, const std::string& node_name){
         if(ImGui::TreeNode(node_name.c_str())){
             if(node->mesh.has_value()) {
-                ImGui::Text("Mesh: %s", node->mesh.value().c_str());
-                ImGui::Text("Albedo Map: %s", node->material.albedo_map.c_str());
+                our::UnorderedMapKeyCombo("Mesh", node->mesh.value(), meshes);
+                our::UnorderedMapKeyCombo("Albedo Map", node->material.albedo_map, textures);
                 ImGui::ColorEdit3("Albedo Tint", glm::value_ptr(node->material.albedo_tint), ImGuiColorEditFlags_HDR);
-                ImGui::Text("Specular Map: %s", node->material.specular_map.c_str());
+                our::UnorderedMapKeyCombo("Specular Map", node->material.specular_map, textures);
                 ImGui::ColorEdit3("Specular Tint", glm::value_ptr(node->material.specular_tint), ImGuiColorEditFlags_HDR);
-                ImGui::Text("Ambient Occlusion Map: %s", node->material.ambient_occlusion_map.c_str());
-                ImGui::Text("Emissive Map: %s", node->material.emissive_map.c_str());
+                our::UnorderedMapKeyCombo("Ambient Occlusion Map", node->material.ambient_occlusion_map, textures);
+                our::UnorderedMapKeyCombo("Emissive Map", node->material.emissive_map, textures);
                 ImGui::ColorEdit3("Emissive Tint", glm::value_ptr(node->material.emissive_tint), ImGuiColorEditFlags_HDR);
-                ImGui::Text("Roughness Map: %s", node->material.roughness_map.c_str());
-                ImGui::DragFloat("Minimum Roughness", &(node->material.roughness_range.x), 0.01f, 0, 1);
-                ImGui::DragFloat("Maximum Roughness", &(node->material.roughness_range.y), 0.01f, 0, 1);
+                our::UnorderedMapKeyCombo("Roughness Map", node->material.roughness_map, textures);
+                ImGui::DragFloatRange2("Roughness Range", &(node->material.roughness_range.x), &(node->material.roughness_range.y), 0.01f, 0.0f, 1.0f);
             }
             ImGui::DragFloat3("Translation", glm::value_ptr(node->translation), 0.1f);
             ImGui::DragFloat3("Rotation", glm::value_ptr(node->rotation), 0.01f);
@@ -420,6 +442,7 @@ class TexturedMaterialApplication : public our::Application {
         ImGui::ColorEdit3("Sky Top Color", glm::value_ptr(sky_light.top_color), ImGuiColorEditFlags_HDR);
         ImGui::ColorEdit3("Sky Middle Color", glm::value_ptr(sky_light.middle_color), ImGuiColorEditFlags_HDR);
         ImGui::ColorEdit3("Sky Bottom Color", glm::value_ptr(sky_light.bottom_color), ImGuiColorEditFlags_HDR);
+        ImGui::DragFloat("Sky Box Exposure (Background Only)", &sky_box_exposure, 0.1f);
 
         ImGui::Separator();
 
