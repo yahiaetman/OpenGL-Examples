@@ -72,8 +72,8 @@ namespace our {
             glUniform4f(getUniformLocation(uniform), value.x, value.y, value.z, value.w);
         }
 
-        void set(const std::string &uniform, glm::mat4 value)  {
-            glUniformMatrix4fv(getUniformLocation(uniform), 1, GL_FALSE, glm::value_ptr(value));
+        void set(const std::string &uniform, glm::mat4 value, GLboolean transpose = false)  {
+            glUniformMatrix4fv(getUniformLocation(uniform), 1, transpose, glm::value_ptr(value));
         }
 
 

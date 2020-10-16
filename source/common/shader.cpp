@@ -4,6 +4,7 @@
 #include <iostream>
 #include <filesystem>
 
+#define STB_INCLUDE_LINE_GLSL
 #define STB_INCLUDE_IMPLEMENTATION
 #include <stb/stb_include.h>
 

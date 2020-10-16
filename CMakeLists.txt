@@ -121,3 +121,6 @@ target_link_libraries(EX27_POSTPROCESSING glfw)
 
 add_executable(EX28_MULTIPLE_RENDER_TARGETS source/examples/ex28_multiple_render_targets.cpp ${COMMON_SOURCES} ${VENDOR_SOURCES})
 target_link_libraries(EX28_MULTIPLE_RENDER_TARGETS glfw)
+
+add_executable(EX29_LIGHT source/examples/ex29_light.cpp ${COMMON_SOURCES} ${VENDOR_SOURCES})
+target_link_libraries(EX29_LIGHT glfw)
