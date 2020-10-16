@@ -6,6 +6,7 @@
 #include <vector>
 #include <functional>
 #include <iostream>
+#include <cassert>
 
 #include <glad/gl.h>
 

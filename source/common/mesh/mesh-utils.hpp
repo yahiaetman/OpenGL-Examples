@@ -7,7 +7,7 @@
 
 namespace our::mesh_utils {
 
-    void loadOBJ(Mesh& mesh, const char* filename);
+    bool loadOBJ(Mesh& mesh, const char* filename);
     void Cuboid(Mesh& mesh, bool colored_faces = false,
                 const glm::vec3& center = {0,0,0},
                 const glm::vec3& size = {1,1,1},

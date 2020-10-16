@@ -385,7 +385,8 @@ class TexturedMaterialApplication : public our::Application {
 
         glUseProgram(sky_program);
 
-        sky_program.set("projection", camera.getProjectionMatrix());
+        sky_program.set("view_projection", camera.getVPMatrix());
+        sky_program.set("camera_position", camera.getEyePosition());
         sky_program.set("sky_light.top_color", sky_light.enabled ? sky_light.top_color : glm::vec3(0.0f));
         sky_program.set("sky_light.middle_color", sky_light.enabled ? sky_light.middle_color : glm::vec3(0.0f));
         sky_program.set("sky_light.bottom_color", sky_light.enabled ? sky_light.bottom_color : glm::vec3(0.0f));

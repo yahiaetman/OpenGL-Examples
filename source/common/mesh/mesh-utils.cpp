@@ -21,7 +21,7 @@
 #define YELLOW  our::Color(255, 255,   0, 255)
 #define CYAN    our::Color(  0, 255, 255, 255)
 
-void our::mesh_utils::loadOBJ(our::Mesh &mesh, const char* filename) {
+bool our::mesh_utils::loadOBJ(our::Mesh &mesh, const char* filename) {
 
     auto parent_path_string = std::filesystem::path(filename).parent_path().string();
 
@@ -36,7 +36,8 @@ void our::mesh_utils::loadOBJ(our::Mesh &mesh, const char* filename) {
     std::string warn, err;
 
     if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filename, parent_path_string.c_str())) {
-        throw std::runtime_error(err);
+        std::cerr << "Failed to load obj file \"" << filename << "\" due to error: " << err << std::endl;
+        return false;
     }
     if (!warn.empty()) {
         std::cout << "WARN while loading obj file \"" << filename << "\": " << warn << std::endl;
@@ -87,6 +88,7 @@ void our::mesh_utils::loadOBJ(our::Mesh &mesh, const char* filename) {
     mesh.create({our::setup_buffer_accessors<Vertex>});
     mesh.setVertexData(0, vertices);
     mesh.setElementData(elements);
+    return true;
 }
 
 
