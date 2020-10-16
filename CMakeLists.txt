@@ -124,3 +124,12 @@ target_link_libraries(EX28_MULTIPLE_RENDER_TARGETS glfw)
 
 add_executable(EX29_LIGHT source/examples/ex29_light.cpp ${COMMON_SOURCES} ${VENDOR_SOURCES})
 target_link_libraries(EX29_LIGHT glfw)
+
+add_executable(EX30_LIGHT_ARRAY source/examples/ex30_light_array.cpp ${COMMON_SOURCES} ${VENDOR_SOURCES})
+target_link_libraries(EX30_LIGHT_ARRAY glfw)
+
+add_executable(EX31_LIGHT_MULTIPASS source/examples/ex31_light_multipass.cpp ${COMMON_SOURCES} ${VENDOR_SOURCES})
+target_link_libraries(EX31_LIGHT_MULTIPASS glfw)
+
+add_executable(EX32_TEXTURED_MATERIAL source/examples/ex32_textured_material.cpp ${COMMON_SOURCES} ${VENDOR_SOURCES})
+target_link_libraries(EX32_TEXTURED_MATERIAL glfw)

@@ -1,0 +1,65 @@
+{
+  "children": {
+    "ground": {
+      "mesh": "plane",
+      "scale": [500, 1, 500],
+      "material": {
+        "albedo_map": "checkerboard_albedo",
+        "specular_map": "checkerboard_specular",
+        "roughness_map": "checkerboard_roughness"
+      }
+    },
+    "asphalt suzanne": {
+      "mesh": "suzanne",
+      "translation": [-3, 1, 0],
+      "material": {
+        "albedo_map": "asphalt_albedo",
+        "specular_map": "asphalt_specular",
+        "roughness_map": "asphalt_roughness",
+        "ambient_occlusion_map": "suzanne_ambient_occlusion",
+        "emissive_map": "asphalt_emissive"
+      }
+    },
+    "metal suzanne": {
+      "mesh": "suzanne",
+      "translation": [0, 1, 0],
+      "material": {
+        "albedo_map": "metal_albedo",
+        "specular_map": "metal_specular",
+        "roughness_map": "metal_roughness",
+        "ambient_occlusion_map": "suzanne_ambient_occlusion"
+      }
+    },
+    "wood suzanne": {
+      "mesh": "suzanne",
+      "translation": [3, 1, 0],
+      "material": {
+        "albedo_map": "wood_albedo",
+        "specular_map": "wood_specular",
+        "roughness_map": "wood_roughness",
+        "ambient_occlusion_map": "suzanne_ambient_occlusion"
+      }
+    },
+    "house": {
+      "mesh": "house",
+      "translation": [0, 0, -5],
+      "material": {
+        "albedo_map": "house"
+      }
+    },
+    "moon-axis": {
+      "translation": [10, 10, -10],
+      "rotation": [1, 0.5, 1],
+      "children": {
+        "moon": {
+          "mesh": "sphere",
+          "scale": [3, 3, 3],
+          "material": {
+            "albedo_map": "black",
+            "emissive_map": "moon"
+          }
+        }
+      }
+    }
+  }
+}
