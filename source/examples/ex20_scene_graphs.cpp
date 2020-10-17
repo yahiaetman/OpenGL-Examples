@@ -25,21 +25,19 @@ namespace glm {
 }
 
 struct Transform {
-    std::string name;
     glm::vec4 tint;
     glm::vec3 translation, rotation, scale;
     std::optional<std::string> mesh;
-    std::vector<std::shared_ptr<Transform>> children;
+    std::unordered_map<std::string, std::shared_ptr<Transform>> children;
 
 
     Transform(
-            const std::string& name = "Object",
             const glm::vec4& tint = {1,1,1,1},
             const glm::vec3& translation = {0,0,0},
             const glm::vec3& rotation = {0,0,0},
             const glm::vec3& scale = {1,1,1},
             const std::optional<std::string>& mesh = std::nullopt
-                    ): name(name), tint(tint), translation(translation), rotation(rotation), scale(scale), mesh(mesh) {}
+                    ): tint(tint), translation(translation), rotation(rotation), scale(scale), mesh(mesh) {}
 
     [[nodiscard]] glm::mat4 to_mat4() const {
         return glm::translate(glm::mat4(1.0f), translation) *
@@ -103,7 +101,6 @@ class SceneGraphApplication : public our::Application {
 
     std::shared_ptr<Transform> loadNode(const nlohmann::json& json){
         auto node = std::make_shared<Transform>(
-                json.value("name", ""),
                 json.value<glm::vec4>("tint", {1,1,1,1}),
                 json.value<glm::vec3>("translation", {0, 0, 0}),
                 json.value<glm::vec3>("rotation", {0, 0, 0}),
@@ -113,8 +110,8 @@ class SceneGraphApplication : public our::Application {
             node->mesh = json["mesh"].get<std::string>();
         }
         if(json.contains("children")){
-            for(auto& child: json["children"]){
-                node->children.push_back(loadNode(child));
+            for(auto& [name, child]: json["children"].items()){
+                node->children[name] = loadNode(child);
             }
         }
         return node;
@@ -139,7 +136,7 @@ class SceneGraphApplication : public our::Application {
                 it->second->draw();
             }
         }
-        for(auto& child: node->children){
+        for(auto& [name, child]: node->children){
             drawNode(child, transform_matrix);
         }
     }
@@ -163,18 +160,17 @@ class SceneGraphApplication : public our::Application {
         meshes.clear();
     }
 
-    void displayNodeGui(const std::shared_ptr<Transform>& node, const std::string& path){
-        std::string label = node->name + "##" + path;
-        if(ImGui::TreeNode(label.c_str())){
+    void displayNodeGui(const std::shared_ptr<Transform>& node, const std::string& node_name){
+        if(ImGui::TreeNode(node_name.c_str())){
             if(node->mesh.has_value()) {
-                ImGui::Text("Mesh: %s", node->mesh.value().c_str());
+                our::PairIteratorCombo("Mesh", node->mesh.value(), meshes.begin(), meshes.end());
                 ImGui::ColorEdit4("Tint", glm::value_ptr(node->tint));
             }
             ImGui::DragFloat3("Translation", glm::value_ptr(node->translation), 0.1f);
             ImGui::DragFloat3("Rotation", glm::value_ptr(node->rotation), 0.01f);
             ImGui::DragFloat3("Scale", glm::value_ptr(node->scale), 0.1f);
-            for(size_t index = 0, size = node->children.size(); index < size; ++index){
-                displayNodeGui(node->children[index], path + "/" + std::to_string(index));
+            for(auto& [name, child]: node->children){
+                displayNodeGui(child, name);
             }
             ImGui::TreePop();
         }
@@ -194,7 +190,7 @@ class SceneGraphApplication : public our::Application {
             ImGui::EndCombo();
         }
 
-        displayNodeGui(roots[current_root_name], "0");
+        displayNodeGui(roots[current_root_name], current_root_name);
         ImGui::End();
     }
 

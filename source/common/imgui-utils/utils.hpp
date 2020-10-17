@@ -5,6 +5,8 @@
 #include <iterator>
 #include <optional>
 #include <map>
+#include <iterator>
+#include <type_traits>
 
 #include <glad/gl.h>
 #include <imgui.h>
@@ -115,10 +117,11 @@ namespace our {
         }
     }
 
-    template<typename T>
-    static void MapKeyCombo(const char* label, std::string& selected, const std::map<std::string, T>& options){
+    template<typename It>
+    static void IteratorCombo(const char* label, std::string& selected, It begin, It end){
         if(ImGui::BeginCombo(label, selected.c_str())){
-            for(auto const& [key, value] : options){
+            for(It it = begin; it != end; ++it){
+                auto& key = *it;
                 bool is_selected = selected == key;
                 if(ImGui::Selectable(key.c_str(), is_selected))
                     selected = key;
@@ -129,10 +132,11 @@ namespace our {
         }
     }
 
-    template<typename T>
-    static void UnorderedMapKeyCombo(const char* label, std::string& selected, const std::unordered_map<std::string, T>& options){
+    template<typename It>
+    static void PairIteratorCombo(const char* label, std::string& selected, It begin, It end){
         if(ImGui::BeginCombo(label, selected.c_str())){
-            for(auto const& [key, value] : options){
+            for(It it = begin; it != end; ++it){
+                auto& [key, value] = *it;
                 bool is_selected = selected == key;
                 if(ImGui::Selectable(key.c_str(), is_selected))
                     selected = key;
@@ -142,7 +146,6 @@ namespace our {
             ImGui::EndCombo();
         }
     }
-
 
     static bool ColorEdit4U8(const char* label, uint8_t* color, ImGuiColorEditFlags flags = 0){
         float color_f32[4] = { color[0]/255.0f, color[1]/255.0f, color[2]/255.0f, color[3]/255.0f };

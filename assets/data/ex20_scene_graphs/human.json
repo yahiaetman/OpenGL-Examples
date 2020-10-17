@@ -1,139 +1,115 @@
 {
-  "name": "human",
-  "children": [
-    {
-      "name": "abdomen",
+  "children": {
+    "abdomen": {
       "mesh": "cube",
       "scale": [0.4, 1, 0.1]
     },
-    {
-      "name": "neck-joint",
+    "neck-joint": {
       "translation": [0, 0.5, 0],
-      "children": [
-        {
-          "name": "neck",
+      "children": {
+        "neck":{
           "mesh": "rod",
           "scale": [0.1, 0.1, 0.2],
           "rotation": [-1.5, 0, 0]
         },
-        {
-          "name": "head-joint",
+        "head-joint":{
           "translation": [0, 0.3, 0],
-          "children": [
-            {
-              "name": "head",
+          "children": {
+            "head": {
               "mesh": "sphere",
               "scale": [0.4, 0.4, 0.4]
             },
-            {
-              "name": "eye-left",
+            "eye-left": {
               "mesh": "sphere",
               "scale": [0.05, 0.05, 0.05],
               "translation": [-0.1, 0, 0.2],
               "tint": [0.1, 0.1, 0.1, 1]
             },
-            {
-              "name": "eye-right",
+            "eye-right": {
               "mesh": "sphere",
               "scale": [0.05, 0.05, 0.05],
               "translation": [0.1, 0, 0.2],
               "tint": [0.1, 0.1, 0.1, 1]
             }
-          ]
+          }
         }
-      ]
+    }
     },
-    {
-      "name": "arm-joint-left",
+    "arm-joint-left": {
       "translation": [-0.2, 0.5, 0],
       "rotation": [0, -1.5, 0],
-      "children": [
-        {
-          "name": "arm-left",
+      "children": {
+        "arm-left": {
           "scale": [0.1, 0.1, 0.5],
           "mesh": "rod"
         },
-        {
-          "name": "forearm-joint-left",
+        "forearm-joint-left": {
           "translation": [0, 0, 0.5],
-          "children": [
-            {
-              "name": "forearm-left",
+          "children": {
+            "forearm-left": {
               "scale": [0.1, 0.1, 0.5],
               "mesh": "rod"
             }
-          ]
+          }
         }
-      ]
+      }
     },
-    {
-      "name": "arm-joint-right",
+    "arm-joint-right": {
       "translation": [0.2, 0.5, 0],
       "rotation": [0, 1.5, 0],
-      "children": [
-        {
-          "name": "arm-right",
+      "children": {
+        "arm-right": {
           "scale": [0.1, 0.1, 0.5],
           "mesh": "rod"
         },
-        {
-          "name": "forearm-joint-right",
+        "forearm-joint-right": {
           "translation": [0, 0, 0.5],
-          "children": [
-            {
-              "name": "forearm-right",
+          "children": {
+            "forearm-right":{
               "scale": [0.1, 0.1, 0.5],
               "mesh": "rod"
             }
-          ]
+          }
         }
-      ]
+      }
     },
-    {
-      "name": "upper-leg-joint-left",
+    "upper-leg-joint-left": {
       "translation": [-0.2, -0.5, 0],
       "rotation": [1.5, 0, 0],
-      "children": [
-        {
-          "name": "upper-leg-left",
+      "children": {
+        "upper-leg-left": {
           "scale": [0.1, 0.1, 0.5],
           "mesh": "rod"
         },
-        {
-          "name": "lower-leg-joint-left",
+        "lower-leg-joint-left": {
           "translation": [0, 0, 0.5],
-          "children": [
-            {
-              "name": "lower-leg-left",
+          "children": {
+            "lower-leg-left": {
               "scale": [0.1, 0.1, 0.5],
               "mesh": "rod"
             }
-          ]
+          }
         }
-      ]
+      }
     },
-    {
-      "name": "upper-leg-joint-right",
+    "upper-leg-joint-right": {
       "translation": [0.2, -0.5, 0],
       "rotation": [1.5, 0, 0],
-      "children": [
-        {
-          "name": "upper-leg-right",
+      "children": {
+        "upper-leg-right": {
           "scale": [0.1, 0.1, 0.5],
           "mesh": "rod"
         },
-        {
-          "name": "lower-leg-joint-right",
+        "lower-leg-joint-right": {
           "translation": [0, 0, 0.5],
-          "children": [
-            {
-              "name": "lower-leg-right",
+          "children": {
+            "lower-leg-right": {
               "scale": [0.1, 0.1, 0.5],
               "mesh": "rod"
             }
-          ]
+          }
         }
-      ]
+      }
     }
-  ]
+  }
 }

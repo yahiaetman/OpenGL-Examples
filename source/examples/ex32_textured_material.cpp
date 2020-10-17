@@ -409,15 +409,15 @@ class TexturedMaterialApplication : public our::Application {
     void displayNodeGui(const std::shared_ptr<Transform>& node, const std::string& node_name){
         if(ImGui::TreeNode(node_name.c_str())){
             if(node->mesh.has_value()) {
-                our::UnorderedMapKeyCombo("Mesh", node->mesh.value(), meshes);
-                our::UnorderedMapKeyCombo("Albedo Map", node->material.albedo_map, textures);
+                our::PairIteratorCombo("Mesh", node->mesh.value(), meshes.begin(), meshes.end());
+                our::PairIteratorCombo("Albedo Map", node->material.albedo_map, textures.begin(), textures.end());
                 ImGui::ColorEdit3("Albedo Tint", glm::value_ptr(node->material.albedo_tint), ImGuiColorEditFlags_HDR);
-                our::UnorderedMapKeyCombo("Specular Map", node->material.specular_map, textures);
+                our::PairIteratorCombo("Specular Map", node->material.specular_map, textures.begin(), textures.end());
                 ImGui::ColorEdit3("Specular Tint", glm::value_ptr(node->material.specular_tint), ImGuiColorEditFlags_HDR);
-                our::UnorderedMapKeyCombo("Ambient Occlusion Map", node->material.ambient_occlusion_map, textures);
-                our::UnorderedMapKeyCombo("Emissive Map", node->material.emissive_map, textures);
+                our::PairIteratorCombo("Ambient Occlusion Map", node->material.ambient_occlusion_map, textures.begin(), textures.end());
+                our::PairIteratorCombo("Emissive Map", node->material.emissive_map, textures.begin(), textures.end());
                 ImGui::ColorEdit3("Emissive Tint", glm::value_ptr(node->material.emissive_tint), ImGuiColorEditFlags_HDR);
-                our::UnorderedMapKeyCombo("Roughness Map", node->material.roughness_map, textures);
+                our::PairIteratorCombo("Roughness Map", node->material.roughness_map, textures.begin(), textures.end());
                 ImGui::DragFloatRange2("Roughness Range", &(node->material.roughness_range.x), &(node->material.roughness_range.y), 0.01f, 0.0f, 1.0f);
             }
             ImGui::DragFloat3("Translation", glm::value_ptr(node->translation), 0.1f);

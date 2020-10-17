@@ -1,46 +1,40 @@
 {
   "name": "root",
   "mesh": "cube",
-  "children": [
-    {
-      "name": "child-1",
+  "children": {
+    "child-1": {
       "translation": [-2, 2, 0],
       "scale": [0.5, 0.5, 0.5],
       "mesh": "cube",
-      "children": [
-        {
-          "name": "grand-child-1",
+      "children": {
+        "grand-child-1": {
           "translation": [0, 2, -2],
           "scale": [0.5, 0.5, 0.5],
           "mesh": "cube"
         },
-        {
-          "name": "grand-child-2",
+        "grand-child-2": {
           "translation": [0, 2, 2],
           "scale": [0.5, 0.5, 0.5],
           "mesh": "cube"
         }
-      ]
+      }
     },
-    {
-      "name": "child-2",
+    "child-2": {
       "translation": [2, 2, 0],
       "scale": [0.5, 0.5, 0.5],
       "mesh": "cube",
-      "children": [
-        {
-          "name": "grand-child-1",
+      "children": {
+        "grand-child-1": {
           "translation": [0, 2, -2],
           "scale": [0.5, 0.5, 0.5],
           "mesh": "cube"
         },
-        {
-          "name": "grand-child-2",
+        "grand-child-2": {
           "translation": [0, 2, 2],
           "scale": [0.5, 0.5, 0.5],
           "mesh": "cube"
         }
-      ]
+      }
     }
-  ]
+  }
 }

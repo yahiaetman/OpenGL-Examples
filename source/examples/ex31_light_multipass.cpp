@@ -274,7 +274,7 @@ class LightMultipassApplication : public our::Application {
     void displayNodeGui(const std::shared_ptr<Transform>& node, const std::string& node_name){
         if(ImGui::TreeNode(node_name.c_str())){
             if(node->mesh.has_value()) {
-                ImGui::Text("Mesh: %s", node->mesh.value().c_str());
+                our::PairIteratorCombo("Mesh", node->mesh.value(), meshes.begin(), meshes.end());
                 ImGui::ColorEdit3("Diffuse", glm::value_ptr(node->material.diffuse), ImGuiColorEditFlags_HDR);
                 ImGui::ColorEdit3("Specular", glm::value_ptr(node->material.specular), ImGuiColorEditFlags_HDR);
                 ImGui::ColorEdit3("Ambient", glm::value_ptr(node->material.ambient), ImGuiColorEditFlags_HDR);
