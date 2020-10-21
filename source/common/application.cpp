@@ -107,8 +107,10 @@ our::WindowConfiguration our::Application::getWindowConfiguration() {
     return {"OpenGL Application", {1280, 720}, false };
 }
 
+// This is the main class function that run the whole application (Initialize, Game loop, House cleaning).
 int our::Application::run() {
 
+    // Set the function to call when an error occurs.
     glfwSetErrorCallback(glfw_error_callback);
 
     if(!glfwInit()){
@@ -116,10 +118,12 @@ int our::Application::run() {
         return -1;
     }
 
-    configureOpenGL();
+    configureOpenGL();                                      // This function sets OpenGL Atrributes.
 
-    auto win_config = getWindowConfiguration();
+    auto win_config = getWindowConfiguration();             // Returns the WindowConfiguration current struct instance.
 
+
+    // Create a window with the given "WindowConfiguration" attributes.
     GLFWmonitor* monitor = win_config.isFullscreen ? glfwGetPrimaryMonitor() : nullptr;
     window = glfwCreateWindow(win_config.size.x, win_config.size.y, win_config.title, monitor, nullptr);
     if(!window) {
@@ -127,7 +131,7 @@ int our::Application::run() {
         glfwTerminate();
         return -1;
     }
-    glfwMakeContextCurrent(window);
+    glfwMakeContextCurrent(window);         // Tell GLFW to make the context of our window the main context on the current thread.
 
     gladLoadGL(glfwGetProcAddress);
 
@@ -209,9 +213,19 @@ int our::Application::run() {
     return 0;
 }
 
+// Sets-up the window callback functions from GLFW to our (Mouse/Keyboard) classes.
 void our::Application::setupCallbacks() {
-    glfwSetWindowUserPointer(window, this);
 
+    // We use GLFW to store a pointer to "this" window instance.
+    glfwSetWindowUserPointer(window, this);
+    // The pointer is then retrieved in the callback function.
+
+    // The second parameter to "glfwSet---Callback" is a function pointer.
+    // It is replaced by an inline function -lambda expression- as it is not needed to create
+    // a seperate function for it.
+    // In the inline function we retrieve the window instance and use it to set our (Mouse/Keyboard) classes values.
+
+    // Keyboard callbacks
     glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods){
         auto* app = static_cast<Application*>(glfwGetWindowUserPointer(window));
         if(app){
@@ -220,6 +234,7 @@ void our::Application::setupCallbacks() {
         }
     });
 
+    // mouse position callbacks
     glfwSetCursorPosCallback(window, [](GLFWwindow* window, double x_position, double y_position){
         auto* app = static_cast<Application*>(glfwGetWindowUserPointer(window));
         if(app){
@@ -228,6 +243,7 @@ void our::Application::setupCallbacks() {
         }
     });
 
+    // mouse position callbacks
     glfwSetCursorEnterCallback(window, [](GLFWwindow* window, int entered){
         auto* app = static_cast<Application*>(glfwGetWindowUserPointer(window));
         if(app){
@@ -235,6 +251,7 @@ void our::Application::setupCallbacks() {
         }
     });
 
+    // mouse button position callbacks
     glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int mods){
         auto* app = static_cast<Application*>(glfwGetWindowUserPointer(window));
         if(app){
@@ -243,6 +260,7 @@ void our::Application::setupCallbacks() {
         }
     });
 
+    // mouse scroll callbacks
     glfwSetScrollCallback(window, [](GLFWwindow* window, double x_offset, double y_offset){
         auto* app = static_cast<Application*>(glfwGetWindowUserPointer(window));
         if(app){
