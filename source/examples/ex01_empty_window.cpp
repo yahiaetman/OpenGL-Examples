@@ -3,7 +3,7 @@
 // This exercise Window Application that derives from "Application" parent
 class EmptyWindowApplication : public our::Application {
 
-    // This overrided function sets the window configeration params struct (title, size, isFullscreen).
+    // This overriden function sets the window configuration params struct (title, size, isFullscreen).
     our::WindowConfiguration getWindowConfiguration() override {
         return { "Empty Window", {1280, 720}, false };
     }
@@ -17,6 +17,7 @@ class EmptyWindowApplication : public our::Application {
     }
 
     void onImmediateGui(ImGuiIO &io) override {
+        // Shows a metric window just as an example of ImGui operations
         ImGui::ShowMetricsWindow();
     }
 
