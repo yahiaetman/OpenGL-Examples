@@ -5,4 +5,5 @@ build/
 # imgui saved state
 imgui.ini
 
+# Since ".obj" are ignored by default, we force them to be added
 !assets/models/**/*.obj
