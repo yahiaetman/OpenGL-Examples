@@ -10,6 +10,8 @@
 #include <application.hpp>
 
 namespace our {
+
+    // Allows you to control the camera freely in world space
     class FlyCameraController {
     private:
         Application* app;
@@ -20,7 +22,7 @@ namespace our {
 
         float yaw_sensitivity, pitch_sensitivity, fov_sensitivity;
         glm::vec3 position_sensitivity;
-        float speedup_factor = 5.0f;
+        float speedup_factor = 5.0f; // A speed multiplier if "Left Shift" is held.
 
         bool mouse_locked = false;
 

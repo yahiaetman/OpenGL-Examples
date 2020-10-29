@@ -8,6 +8,8 @@
 
 namespace our {
 
+    // For each of our common vertex types, we are defining how they can be sent to the shader attributes
+
     template<>
     inline void setup_buffer_accessors<ColoredVertex>() {
 

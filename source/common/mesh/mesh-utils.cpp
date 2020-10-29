@@ -1,5 +1,6 @@
 #include "mesh-utils.hpp"
 
+// We will use "Tiny OBJ Loader" to read and process '.obj" files
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tinyobj/tiny_obj_loader.h>
 
@@ -23,13 +24,19 @@
 
 bool our::mesh_utils::loadOBJ(our::Mesh &mesh, const char* filename) {
 
+    // We get the parent path since we would like to see if contains any ".mtl" file that define the object materials
     auto parent_path_string = std::filesystem::path(filename).parent_path().string();
 
-
+    // The data that we will use to initialize our mesh
     std::vector<our::Vertex> vertices;
     std::vector<GLuint> elements;
+
+    // Since the OBJ can have duplicated vertices, we make them unique using this map
+    // The key is the vertex, the value is its index in the vector "vertices".
+    // That index will be used to populate the "elements" vector.
     std::unordered_map<our::Vertex, GLuint> vertex_map;
 
+    // The data loaded by Tiny OBJ Loader
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> materials;
@@ -43,10 +50,14 @@ bool our::mesh_utils::loadOBJ(our::Mesh &mesh, const char* filename) {
         std::cout << "WARN while loading obj file \"" << filename << "\": " << warn << std::endl;
     }
 
+    // An obj file can have multiple shapes where each shape can have its own material
+    // Ideally, we would load each shape into a separate mesh or store the start and end of it in the element buffer to be able to draw each shape separately
+    // But we ignored this fact since we don't plan to use multiple materials in the examples
     for (const auto &shape : shapes) {
         for (const auto &index : shape.mesh.indices) {
             Vertex vertex = {};
 
+            // Read the data for a vertex from the "attrib" object
             vertex.position = {
                     attrib.vertices[3 * index.vertex_index + 0],
                     attrib.vertices[3 * index.vertex_index + 1],
@@ -72,18 +83,22 @@ bool our::mesh_utils::loadOBJ(our::Mesh &mesh, const char* filename) {
                     255
             };
 
+            // See if we already stored a similar vertex
             auto it = vertex_map.find(vertex);
             if (it == vertex_map.end()) {
+                // if no, add it to the vertices and record its index
                 auto new_vertex_index = static_cast<GLuint>(vertices.size());
                 vertex_map[vertex] = new_vertex_index;
                 elements.push_back(new_vertex_index);
                 vertices.push_back(vertex);
             } else {
+                // if yes, just add its index in the elements vector
                 elements.push_back(it->second);
             }
         }
     }
 
+    // Create and populate the OpenGL objects in the mesh
     if (mesh.isCreated()) mesh.destroy();
     mesh.create({our::setup_buffer_accessors<Vertex>});
     mesh.setVertexData(0, vertices);
@@ -99,6 +114,7 @@ void our::mesh_utils::Cuboid(Mesh& mesh,
             const glm::vec2& texture_offset,
             const glm::vec2& texture_tiling){
 
+    // These are just temporary variables that will help us populate the vertex array
     glm::vec3 half_size = size * 0.5f;
     glm::vec3 bounds[] = {center - half_size, center + half_size};
     glm::vec3 corners[] = {
@@ -123,6 +139,7 @@ void our::mesh_utils::Cuboid(Mesh& mesh,
             {{ 0, 0,-1}, {0,0,1}}
     };
 
+    // We populate each face with 4 vertices that define it's corners
     std::vector<Vertex> vertices = {
             //Upper Face
             {corners[2], colored_faces ? GREEN : WHITE , tex_coords[0], normals[1][1]},
@@ -155,6 +172,7 @@ void our::mesh_utils::Cuboid(Mesh& mesh,
             {corners[6], colored_faces ? YELLOW : WHITE, tex_coords[3], normals[2][0]},
             {corners[4], colored_faces ? YELLOW : WHITE, tex_coords[1], normals[2][0]},
     };
+    // Then we define the elements for the 2 triangles that define each face
     std::vector<GLuint> elements = {
             //Upper Face
             0, 1, 2, 2, 3, 0,
@@ -170,6 +188,8 @@ void our::mesh_utils::Cuboid(Mesh& mesh,
             20, 21, 22, 22, 23, 20,
     };
 
+    // Create and populate the OpenGL objects in the mesh
+    if (mesh.isCreated()) mesh.destroy();
     mesh.create({our::setup_buffer_accessors<Vertex>});
     mesh.setVertexData(0, vertices);
     mesh.setElementData(elements);
@@ -182,6 +202,7 @@ void our::mesh_utils::Sphere(our::Mesh& mesh, const glm::ivec2& segments, bool c
     std::vector<our::Vertex> vertices;
     std::vector<GLuint> elements;
 
+    // We populate the sphere vertices by looping over its longitude and latitude
     for(int lat = 0; lat <= segments.y; lat++){
         float v = (float)lat / segments.y;
         float pitch = v * glm::pi<float>() - glm::half_pi<float>();
@@ -210,6 +231,8 @@ void our::mesh_utils::Sphere(our::Mesh& mesh, const glm::ivec2& segments, bool c
         }
     }
 
+    // Create and populate the OpenGL objects in the mesh
+    if (mesh.isCreated()) mesh.destroy();
     mesh.create({our::setup_buffer_accessors<Vertex>});
     mesh.setVertexData(0, vertices);
     mesh.setElementData(elements);
@@ -251,6 +274,8 @@ void our::mesh_utils::Plane(our::Mesh& mesh, const glm::ivec2& resolution, bool 
         }
     }
 
+    // Create and populate the OpenGL objects in the mesh
+    if (mesh.isCreated()) mesh.destroy();
     mesh.create({our::setup_buffer_accessors<Vertex>});
     mesh.setVertexData(0, vertices);
     mesh.setElementData(elements);

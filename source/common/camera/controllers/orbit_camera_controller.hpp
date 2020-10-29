@@ -11,6 +11,7 @@
 
 namespace our {
 
+    // Allows you to control the camera in an orbit motion around a point in world space
     class OrbitCameraController {
     private:
         Application* app;

@@ -43,17 +43,33 @@ glm::ivec2 our::texture_utils::loadImage(GLuint texture, const char *filename, b
 glm::ivec2 our::texture_utils::loadImageGrayscale(GLuint texture, const char *filename, bool generate_mipmap) {
     glm::ivec2 size;
     int channels;
+    //Since OpenGL puts the texture origin at the bottom left while images typically has the origin at the top left,
+    //We need to till stb to flip images vertically after loading them
     stbi_set_flip_vertically_on_load(true);
+    //Load image data and retrieve width, height and number of channels in the image
+    //The last argument is the number of channels we want and it can have the following values:
+    //- 0: Keep number of channels the same as in the image file
+    //- 1: Grayscale only
+    //- 2: Grayscale and Alpha
+    //- 3: RGB
+    //- 4: RGB and Alpha
+    //Note: channels (the 4th argument) always returns the original number of channels in the file
     unsigned char* data = stbi_load(filename, &size.x, &size.y, &channels, 1);
     if(data == nullptr){
         std::cerr << "Failed to load image: " << filename << std::endl;
         return {0, 0};
     }
+    //Bind the texture such that we upload the image data to its storage
     glBindTexture(GL_TEXTURE_2D, texture);
+    //Set Unpack Alignment to 1-byte (it means that each row takes multiple of 1 bytes in memory)
+    //Note: Alignment is 4 by default which may not work for grayscale images if the row size is not divisible by 4.
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    //Send data to texture
+    //NOTE: the internal format is set to GL_R8 so every pixel contains 1 byte only
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, size.x, size.y, 0, GL_RED, GL_UNSIGNED_BYTE, data);
+    //Generate versions of the texture at smaller level of details (useful for filtering)
     if(generate_mipmap) glGenerateMipmap(GL_TEXTURE_2D);
-    stbi_image_free(data);
+    stbi_image_free(data); //Free image data after uploading to GPU
     return size;
 }
 
