@@ -90,6 +90,7 @@ class BlendingApplication : public our::Application {
     bool enable_blending;
     GLenum blend_equation = GL_FUNC_ADD;
     GLenum blend_source_function = GL_SRC_ALPHA, blend_destination_function = GL_ONE_MINUS_SRC_ALPHA;
+    glm::vec4 blend_constant_color = {1.0f,1.0f,1.0f,1.0f};
 
     bool enable_alpha_test = false;
     float alpha_test_threshold = 0.5;
@@ -234,6 +235,7 @@ class BlendingApplication : public our::Application {
 
         glBlendEquation(blend_equation);
         glBlendFunc(blend_source_function, blend_destination_function);
+        glBlendColor(blend_constant_color.r, blend_constant_color.g, blend_constant_color.b, blend_constant_color.a);
 
         if(enable_alpha_to_coverage) glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
         else glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
@@ -290,6 +292,7 @@ class BlendingApplication : public our::Application {
         our::OptionMapCombo("Equation", blend_equation, our::gl_enum_options::blend_equations);
         our::OptionMapCombo("Source Function", blend_source_function, our::gl_enum_options::blend_functions);
         our::OptionMapCombo("Destination Function", blend_destination_function, our::gl_enum_options::blend_functions);
+        ImGui::ColorEdit4("Blend Constant Color", glm::value_ptr(blend_constant_color), ImGuiColorEditFlags_HDR);
 
         ImGui::Separator();
 
