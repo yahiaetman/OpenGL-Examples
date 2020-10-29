@@ -35,12 +35,14 @@ namespace our {
 
         //Get the location of a uniform variable in the shader
         GLuint getUniformLocation(const std::string &name) {
+            // It is not efficient to ask OpenGL for Uniform location everytime we need them
+            // So the first time they are needed, we cache them in a map and reuse them whenever needed again
             auto it = uniform_location_cache.find(name);
             if(it != uniform_location_cache.end()){
-                return it->second;
+                return it->second; // We found the uniform in our cache, so no need to call OpenGL.
             }
-            GLuint location = glGetUniformLocation(program, name.c_str());
-            uniform_location_cache[name] = location;
+            GLuint location = glGetUniformLocation(program, name.c_str()); // The uniform was not found, so we retrieve its location
+            uniform_location_cache[name] = location; // and cache the location for later queries
             return location;
         }
 
@@ -78,6 +80,8 @@ namespace our {
 
 
         //Delete copy constructor and assignment operation
+        //This is important for Class that follow the RAII pattern since we destroy the underlying OpenGL object in deconstruction
+        //So if we copied the object, one of them can destroy the object(s) while the other still thinks they are valid.
         ShaderProgram(ShaderProgram const &) = delete;
         ShaderProgram &operator=(ShaderProgram const &) = delete;
     };
