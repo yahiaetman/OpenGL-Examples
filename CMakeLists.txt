@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.0)   # Selects the minimum version of CMake required to run this file
-project(GFX-LAB VERSION 0.1.0)          # Here we select the project name adn version
+project(GFX-LAB VERSION 0.1.0)          # Here we select the project name and version
 
 # Here we select C++17 with all the standards required and all compiler-specific extensions disabled
 set(CMAKE_CXX_STANDARD 17)
