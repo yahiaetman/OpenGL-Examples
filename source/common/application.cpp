@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <string>
+#include <iomanip>
+#include <ctime>
 
 // Include the Dear ImGui implementation headers
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD2
@@ -12,6 +14,8 @@
 // If NDEBUG (no debug) is not defined, enable OpenGL debug messages
 #define ENABLE_OPENGL_DEBUG_MESSAGES
 #endif
+
+#include "texture/screenshot.h"
 
 // This function will be used to log errors thrown by GLFW
 void glfw_error_callback(int error, const char* description){
@@ -227,6 +231,18 @@ int our::Application::run() {
         glEnable(GL_DEBUG_OUTPUT);
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 #endif
+
+        if(keyboard.justPressed(GLFW_KEY_F12)){
+            std::stringstream stream;
+            auto time = std::time(nullptr);
+            auto localtime = std::localtime(&time);
+            stream << "screenshots/screenshot-" << std::put_time(localtime, "%Y-%m-%d-%H-%M-%S") << ".png";
+            if(our::screenshot_png(stream.str())){
+                std::cout << "Screenshot saved to: " << stream.str() << std::endl;
+            } else {
+                std::cerr << "Failed to save a Screenshot" << std::endl;
+            }
+        }
 
         // Swap the frame buffers
         glfwSwapBuffers(window);

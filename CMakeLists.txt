@@ -34,7 +34,8 @@ set(COMMON_SOURCES
         source/common/application.cpp
         source/common/shader.cpp
         source/common/mesh/mesh-utils.cpp
-        source/common/texture/texture-utils.cpp)
+        source/common/texture/texture-utils.cpp
+        source/common/texture/screenshot.cpp)
 
 # Define the directories in which to search for the included headers
 include_directories(
