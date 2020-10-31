@@ -2,7 +2,7 @@
 
 // Since we are now receiving multiple Varyings, it would be nice to pack them together in what is called an "Interface Block".
 // "Varyings" is just a name for the block (we can choose any name as long as it is the same in the vertex shader).
-// "vsout" is an instance name (we can make multiple instances of the same block and pick any names we want).
+// "vsout" is an instance name (we can make an array of the same block and pick any name we want).
 // instance names can be different in the vertex shader and the blocks will still match and link together.
 // Interface blocks are nice for organization.
 in Varyings {
