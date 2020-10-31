@@ -232,7 +232,9 @@ int our::Application::run() {
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 #endif
 
+        // If F12 is pressed, take a screenshot
         if(keyboard.justPressed(GLFW_KEY_F12)){
+            glViewport(0, 0, frame_buffer_size.x, frame_buffer_size.y);
             std::stringstream stream;
             auto time = std::time(nullptr);
             auto localtime = std::localtime(&time);

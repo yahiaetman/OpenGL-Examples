@@ -1,6 +1,6 @@
 # OpenGL Examples (CMP205)
 
-This repository contains examples of how to use OpenGL with C++17.
+This repository contains examples of how to use OpenGL with C++17. It is made for the "Computer Graphics and Man-Machine Interfacing" course (CMPN205) at Cairo University Faculty of Engineering.
 
 **IMPORTANT:**
 
@@ -43,3 +43,6 @@ This repository contains examples of how to use OpenGL with C++17.
 | Light Array | [ex30_light_array.cpp](source/examples/ex30_light_array.cpp) |  |
 | Multi-Pass Lighting | [ex31_light_multipass.cpp](source/examples/ex31_light_multipass.cpp) |  |
 | Textured Material | [ex32_textured_material.cpp](source/examples/ex32_textured_material.cpp) |  |
+
+## License
+ [MIT License](LICENSE.md)
