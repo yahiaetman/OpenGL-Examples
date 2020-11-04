@@ -103,13 +103,13 @@ class LightArrayApplication : public our::Application {
 
     void onInitialize() override {
         program.create();
-        program.attach("assets/shaders/ex29_light/light_transform.vert", GL_VERTEX_SHADER);
-        program.attach("assets/shaders/ex30_light_array/light_array.frag", GL_FRAGMENT_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex29_light/light_transform.vert", GL_VERTEX_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex30_light_array/light_array.frag", GL_FRAGMENT_SHADER);
         program.link();
 
 
         meshes["suzanne"] = std::make_unique<our::Mesh>();
-        our::mesh_utils::loadOBJ(*(meshes["suzanne"]), "assets/models/Suzanne/Suzanne.obj");
+        our::mesh_utils::loadOBJ(*(meshes["suzanne"]), ASSETS_DIR "/models/Suzanne/Suzanne.obj");
         meshes["plane"] = std::make_unique<our::Mesh>();
         our::mesh_utils::Plane(*(meshes["plane"]), {1, 1}, false, {0, 0, 0}, {1, 1}, {0, 0}, {100, 100});
         meshes["sphere"] = std::make_unique<our::Mesh>();
@@ -127,7 +127,7 @@ class LightArrayApplication : public our::Application {
         camera_controller.initialize(this, &camera);
         camera_controller.setFieldOfViewSensitivity(0.05f );
 
-        std::ifstream file_in("assets/data/ex29_light/scene.json");
+        std::ifstream file_in(ASSETS_DIR "/data/ex29_light/scene.json");
         nlohmann::json json;
         file_in >> json;
         file_in.close();

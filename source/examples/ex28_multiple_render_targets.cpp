@@ -73,12 +73,12 @@ class MultipleRenderTargetsApplication : public our::Application {
 
     void onInitialize() override {
         program.create();
-        program.attach("assets/shaders/ex22_texture_sampling/transform.vert", GL_VERTEX_SHADER);
-        program.attach("assets/shaders/ex28_multiple_render_targets/mrt.frag", GL_FRAGMENT_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex22_texture_sampling/transform.vert", GL_VERTEX_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex28_multiple_render_targets/mrt.frag", GL_FRAGMENT_SHADER);
         program.link();
         blit_program.create();
-        blit_program.attach("assets/shaders/ex27_postprocessing/fullscreen_triangle.vert", GL_VERTEX_SHADER);
-        blit_program.attach("assets/shaders/ex27_postprocessing/blit.frag", GL_FRAGMENT_SHADER);
+        blit_program.attach(ASSETS_DIR "/shaders/ex27_postprocessing/fullscreen_triangle.vert", GL_VERTEX_SHADER);
+        blit_program.attach(ASSETS_DIR "/shaders/ex27_postprocessing/blit.frag", GL_FRAGMENT_SHADER);
         blit_program.link();
 
         GLuint texture;
@@ -87,13 +87,13 @@ class MultipleRenderTargetsApplication : public our::Application {
         our::texture_utils::checkerBoard(texture, {256, 256}, {128, 128}, {255, 255, 255, 255}, {16, 16, 16, 255});
         textures["checkerboard"] = texture;
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/models/House/House.jpeg");
+        our::texture_utils::loadImage(texture, ASSETS_DIR "/models/House/House.jpeg");
         textures["house"] = texture;
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/images/common/moon.jpg");
+        our::texture_utils::loadImage(texture, ASSETS_DIR "/images/common/moon.jpg");
         textures["moon"] = texture;
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/images/ex27_postprocessing/water-normal.png");
+        our::texture_utils::loadImage(texture, ASSETS_DIR "/images/ex27_postprocessing/water-normal.png");
         textures["water-normal"] = texture;
 
         int width, height;
@@ -118,7 +118,7 @@ class MultipleRenderTargetsApplication : public our::Application {
         textures["tex_coord_derivative_rt"] = texture;
 
         meshes["house"] = std::make_unique<our::Mesh>();
-        our::mesh_utils::loadOBJ(*(meshes["house"]), "assets/models/House/House.obj");
+        our::mesh_utils::loadOBJ(*(meshes["house"]), ASSETS_DIR "/models/House/House.obj");
         meshes["plane"] = std::make_unique<our::Mesh>();
         our::mesh_utils::Plane(*(meshes["plane"]), {1, 1}, false, {0, 0, 0}, {1, 1}, {0, 0}, {100, 100});
         meshes["sphere"] = std::make_unique<our::Mesh>();
@@ -145,7 +145,7 @@ class MultipleRenderTargetsApplication : public our::Application {
 
         camera_controller.initialize(this, &camera);
 
-        root = loadSceneGraph("assets/data/ex23_sampler_objects/scene.json");
+        root = loadSceneGraph(ASSETS_DIR "/data/ex23_sampler_objects/scene.json");
 
         glGenFramebuffers(1, &frame_buffer);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame_buffer);

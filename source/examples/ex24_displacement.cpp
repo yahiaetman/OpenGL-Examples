@@ -56,36 +56,36 @@ class DisplacementApplication : public our::Application {
 
     void onInitialize() override {
         program.create();
-        program.attach("assets/shaders/ex24_displacement/terrain.vert", GL_VERTEX_SHADER);
-        program.attach("assets/shaders/ex24_displacement/terrain.frag", GL_FRAGMENT_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex24_displacement/terrain.vert", GL_VERTEX_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex24_displacement/terrain.frag", GL_FRAGMENT_SHADER);
         program.link();
 
         GLuint texture;
         glGenTextures(1, &texture);
-        our::texture_utils::loadImageGrayscale(texture, "assets/images/ex24_displacement/Heightmap_Default.png");
+        our::texture_utils::loadImageGrayscale(texture, ASSETS_DIR "/images/ex24_displacement/Heightmap_Default.png");
         height_textures["default"] = texture;
         glGenTextures(1, &texture);
-        our::texture_utils::loadImageGrayscale(texture, "assets/images/ex24_displacement/Heightmap_Billow.png");
+        our::texture_utils::loadImageGrayscale(texture, ASSETS_DIR "/images/ex24_displacement/Heightmap_Billow.png");
         height_textures["billow"] = texture;
         glGenTextures(1, &texture);
-        our::texture_utils::loadImageGrayscale(texture, "assets/images/ex24_displacement/Heightmap_Island.png");
+        our::texture_utils::loadImageGrayscale(texture, ASSETS_DIR "/images/ex24_displacement/Heightmap_Island.png");
         height_textures["island"] = texture;
         glGenTextures(1, &texture);
-        our::texture_utils::loadImageGrayscale(texture, "assets/images/ex24_displacement/Heightmap_Mountain.png");
+        our::texture_utils::loadImageGrayscale(texture, ASSETS_DIR "/images/ex24_displacement/Heightmap_Mountain.png");
         height_textures["mountain"] = texture;
         glGenTextures(1, &texture);
-        our::texture_utils::loadImageGrayscale(texture, "assets/images/ex24_displacement/Heightmap_Plateau.png");
+        our::texture_utils::loadImageGrayscale(texture, ASSETS_DIR "/images/ex24_displacement/Heightmap_Plateau.png");
         height_textures["plateau"] = texture;
         glGenTextures(1, &texture);
-        our::texture_utils::loadImageGrayscale(texture, "assets/images/ex24_displacement/Heightmap_Rocky.png");
+        our::texture_utils::loadImageGrayscale(texture, ASSETS_DIR "/images/ex24_displacement/Heightmap_Rocky.png");
         height_textures["rocky"] = texture;
 
         current_height_texture_name = "default";
 
         glGenTextures(1, &top_texture);
-        our::texture_utils::loadImage(top_texture, "assets/images/ex24_displacement/mntn_white_d.jpg");
+        our::texture_utils::loadImage(top_texture, ASSETS_DIR "/images/ex24_displacement/mntn_white_d.jpg");
         glGenTextures(1, &bottom_texture);
-        our::texture_utils::loadImage(bottom_texture, "assets/images/ex24_displacement/grass_ground_d.jpg");
+        our::texture_utils::loadImage(bottom_texture, ASSETS_DIR "/images/ex24_displacement/grass_ground_d.jpg");
 
         our::mesh_utils::Plane(plane, {512, 512}, false);
 

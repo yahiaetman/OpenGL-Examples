@@ -22,8 +22,8 @@ class TextureApplication : public our::Application {
 
     void onInitialize() override {
         program.create();
-        program.attach("assets/shaders/ex21_texture/fullscreen_triangle.vert", GL_VERTEX_SHADER);
-        program.attach("assets/shaders/ex21_texture/texel_fetch.frag", GL_FRAGMENT_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex21_texture/fullscreen_triangle.vert", GL_VERTEX_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex21_texture/texel_fetch.frag", GL_FRAGMENT_SHADER);
         program.link();
 
         glGenVertexArrays(1, &vertex_array);
@@ -93,11 +93,11 @@ class TextureApplication : public our::Application {
         textures["bubbles"] = texture;
 
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/images/common/color-grid.png");
+        our::texture_utils::loadImage(texture, ASSETS_DIR "/images/common/color-grid.png");
         textures["color-grid"] = texture;
 
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/images/common/moon.jpg");
+        our::texture_utils::loadImage(texture, ASSETS_DIR "/images/common/moon.jpg");
         textures["moon"] = texture;
 
         current_texture_name = "color-grid";

@@ -149,18 +149,18 @@ class TexturedMaterialApplication : public our::Application {
 
     void onInitialize() override {
         program.create();
-        program.attach("assets/shaders/ex29_light/light_transform.vert", GL_VERTEX_SHADER);
-        program.attach("assets/shaders/ex32_textured_material/light_array.frag", GL_FRAGMENT_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex29_light/light_transform.vert", GL_VERTEX_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex32_textured_material/light_array.frag", GL_FRAGMENT_SHADER);
         program.link();
         sky_program.create();
-        sky_program.attach("assets/shaders/ex32_textured_material/sky_transform.vert", GL_VERTEX_SHADER);
-        sky_program.attach("assets/shaders/ex32_textured_material/sky.frag", GL_FRAGMENT_SHADER);
+        sky_program.attach(ASSETS_DIR "/shaders/ex32_textured_material/sky_transform.vert", GL_VERTEX_SHADER);
+        sky_program.attach(ASSETS_DIR "/shaders/ex32_textured_material/sky.frag", GL_FRAGMENT_SHADER);
         sky_program.link();
 
         meshes["suzanne"] = std::make_unique<our::Mesh>();
-        our::mesh_utils::loadOBJ(*(meshes["suzanne"]), "assets/models/Suzanne/Suzanne.obj");
+        our::mesh_utils::loadOBJ(*(meshes["suzanne"]), ASSETS_DIR "/models/Suzanne/Suzanne.obj");
         meshes["house"] = std::make_unique<our::Mesh>();
-        our::mesh_utils::loadOBJ(*(meshes["house"]), "assets/models/House/House.obj");
+        our::mesh_utils::loadOBJ(*(meshes["house"]), ASSETS_DIR "/models/House/House.obj");
         meshes["plane"] = std::make_unique<our::Mesh>();
         our::mesh_utils::Plane(*(meshes["plane"]), {1, 1}, false, {0, 0, 0}, {1, 1}, {0, 0}, {100, 100});
         meshes["sphere"] = std::make_unique<our::Mesh>();
@@ -188,48 +188,48 @@ class TexturedMaterialApplication : public our::Application {
         textures["checkerboard_roughness"] = texture;
 
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/images/common/materials/asphalt/albedo.jpg");
+        our::texture_utils::loadImage(texture, ASSETS_DIR "/images/common/materials/asphalt/albedo.jpg");
         textures["asphalt_albedo"] = texture;
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/images/common/materials/asphalt/specular.jpg");
+        our::texture_utils::loadImage(texture, ASSETS_DIR "/images/common/materials/asphalt/specular.jpg");
         textures["asphalt_specular"] = texture;
         glGenTextures(1, &texture);
-        our::texture_utils::loadImageGrayscale(texture, "assets/images/common/materials/asphalt/roughness.jpg");
+        our::texture_utils::loadImageGrayscale(texture, ASSETS_DIR "/images/common/materials/asphalt/roughness.jpg");
         textures["asphalt_roughness"] = texture;
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/images/common/materials/asphalt/emissive.jpg");
+        our::texture_utils::loadImage(texture, ASSETS_DIR "/images/common/materials/asphalt/emissive.jpg");
         textures["asphalt_emissive"] = texture;
 
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/images/common/materials/metal/albedo.jpg");
+        our::texture_utils::loadImage(texture, ASSETS_DIR "/images/common/materials/metal/albedo.jpg");
         textures["metal_albedo"] = texture;
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/images/common/materials/metal/specular.jpg");
+        our::texture_utils::loadImage(texture, ASSETS_DIR "/images/common/materials/metal/specular.jpg");
         textures["metal_specular"] = texture;
         glGenTextures(1, &texture);
-        our::texture_utils::loadImageGrayscale(texture, "assets/images/common/materials/metal/roughness.jpg");
+        our::texture_utils::loadImageGrayscale(texture, ASSETS_DIR "/images/common/materials/metal/roughness.jpg");
         textures["metal_roughness"] = texture;
 
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/images/common/materials/wood/albedo.jpg");
+        our::texture_utils::loadImage(texture, ASSETS_DIR "/images/common/materials/wood/albedo.jpg");
         textures["wood_albedo"] = texture;
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/images/common/materials/wood/specular.jpg");
+        our::texture_utils::loadImage(texture, ASSETS_DIR "/images/common/materials/wood/specular.jpg");
         textures["wood_specular"] = texture;
         glGenTextures(1, &texture);
-        our::texture_utils::loadImageGrayscale(texture, "assets/images/common/materials/wood/roughness.jpg");
+        our::texture_utils::loadImageGrayscale(texture, ASSETS_DIR "/images/common/materials/wood/roughness.jpg");
         textures["wood_roughness"] = texture;
 
         glGenTextures(1, &texture);
-        our::texture_utils::loadImageGrayscale(texture, "assets/images/common/materials/suzanne/ambient_occlusion.jpg");
+        our::texture_utils::loadImageGrayscale(texture, ASSETS_DIR "/images/common/materials/suzanne/ambient_occlusion.jpg");
         textures["suzanne_ambient_occlusion"] = texture;
 
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/models/House/House.jpeg");
+        our::texture_utils::loadImage(texture, ASSETS_DIR "/models/House/House.jpeg");
         textures["house"] = texture;
 
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/images/common/moon.jpg");
+        our::texture_utils::loadImage(texture, ASSETS_DIR "/images/common/moon.jpg");
         textures["moon"] = texture;
 
         glGenSamplers(1, &sampler);
@@ -253,13 +253,13 @@ class TexturedMaterialApplication : public our::Application {
         camera_controller.initialize(this, &camera);
         camera_controller.setFieldOfViewSensitivity(0.05f );
 
-        std::ifstream file_in("assets/data/ex32_textured_material/scene.json");
+        std::ifstream file_in(ASSETS_DIR "/data/ex32_textured_material/scene.json");
         nlohmann::json json;
         file_in >> json;
         file_in.close();
         root = loadNode(json);
 
-        file_in.open("assets/data/ex32_textured_material/lights.json");
+        file_in.open(ASSETS_DIR "/data/ex32_textured_material/lights.json");
         file_in >> json;
         file_in.close();
         sky_light = json.value("sky", SkyLight());

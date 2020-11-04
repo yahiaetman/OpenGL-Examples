@@ -103,20 +103,20 @@ class LightMultipassApplication : public our::Application {
 
     void onInitialize() override {
         programs[LightType::DIRECTIONAL].create();
-        programs[LightType::DIRECTIONAL].attach("assets/shaders/ex29_light/light_transform.vert", GL_VERTEX_SHADER);
-        programs[LightType::DIRECTIONAL].attach("assets/shaders/ex29_light/directional_light.frag", GL_FRAGMENT_SHADER);
+        programs[LightType::DIRECTIONAL].attach(ASSETS_DIR "/shaders/ex29_light/light_transform.vert", GL_VERTEX_SHADER);
+        programs[LightType::DIRECTIONAL].attach(ASSETS_DIR "/shaders/ex29_light/directional_light.frag", GL_FRAGMENT_SHADER);
         programs[LightType::DIRECTIONAL].link();
         programs[LightType::POINT].create();
-        programs[LightType::POINT].attach("assets/shaders/ex29_light/light_transform.vert", GL_VERTEX_SHADER);
-        programs[LightType::POINT].attach("assets/shaders/ex29_light/point_light.frag", GL_FRAGMENT_SHADER);
+        programs[LightType::POINT].attach(ASSETS_DIR "/shaders/ex29_light/light_transform.vert", GL_VERTEX_SHADER);
+        programs[LightType::POINT].attach(ASSETS_DIR "/shaders/ex29_light/point_light.frag", GL_FRAGMENT_SHADER);
         programs[LightType::POINT].link();
         programs[LightType::SPOT].create();
-        programs[LightType::SPOT].attach("assets/shaders/ex29_light/light_transform.vert", GL_VERTEX_SHADER);
-        programs[LightType::SPOT].attach("assets/shaders/ex29_light/spot_light.frag", GL_FRAGMENT_SHADER);
+        programs[LightType::SPOT].attach(ASSETS_DIR "/shaders/ex29_light/light_transform.vert", GL_VERTEX_SHADER);
+        programs[LightType::SPOT].attach(ASSETS_DIR "/shaders/ex29_light/spot_light.frag", GL_FRAGMENT_SHADER);
         programs[LightType::SPOT].link();
 
         meshes["suzanne"] = std::make_unique<our::Mesh>();
-        our::mesh_utils::loadOBJ(*(meshes["suzanne"]), "assets/models/Suzanne/Suzanne.obj");
+        our::mesh_utils::loadOBJ(*(meshes["suzanne"]), ASSETS_DIR "/models/Suzanne/Suzanne.obj");
         meshes["plane"] = std::make_unique<our::Mesh>();
         our::mesh_utils::Plane(*(meshes["plane"]), {1, 1}, false, {0, 0, 0}, {1, 1}, {0, 0}, {100, 100});
         meshes["sphere"] = std::make_unique<our::Mesh>();
@@ -134,7 +134,7 @@ class LightMultipassApplication : public our::Application {
         camera_controller.initialize(this, &camera);
         camera_controller.setFieldOfViewSensitivity(0.05f );
 
-        std::ifstream file_in("assets/data/ex29_light/scene.json");
+        std::ifstream file_in(ASSETS_DIR "/data/ex29_light/scene.json");
         nlohmann::json json;
         file_in >> json;
         file_in.close();

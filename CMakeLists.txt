@@ -47,6 +47,8 @@ include_directories(
         vendor/utils
 )
 
+add_definitions(-DASSETS_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/assets\")
+
 # For each example, we add an executable target
 # Each target compiles one example source file and the common & vendor source files
 # Then we link GLFW with each target
