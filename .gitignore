@@ -1,9 +1,17 @@
 # build directories
 cmake-build-*/
 build/
+out/
 
 # imgui saved state
 imgui.ini
 
 # Since ".obj" are ignored by default, we force them to be added
 !assets/models/**/*.obj
+
+# Visual Studio specific files
+CMakeSettings.json
+.vs/
+
+# Clion specific files
+.idea/
