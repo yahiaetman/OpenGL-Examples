@@ -75,8 +75,8 @@ class FrameBufferApplication : public our::Application {
 
     void onInitialize() override {
         program.create();
-        program.attach("assets/shaders/ex22_texture_sampling/transform.vert", GL_VERTEX_SHADER);
-        program.attach("assets/shaders/ex22_texture_sampling/texture.frag", GL_FRAGMENT_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex22_texture_sampling/transform.vert", GL_VERTEX_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex22_texture_sampling/texture.frag", GL_FRAGMENT_SHADER);
         program.link();
 
         GLuint texture;
@@ -85,10 +85,10 @@ class FrameBufferApplication : public our::Application {
         our::texture_utils::checkerBoard(texture, {256, 256}, {128, 128}, {255, 255, 255, 255}, {16, 16, 16, 255});
         textures["checkerboard"] = texture;
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/models/House/House.jpeg");
+        our::texture_utils::loadImage(texture, ASSETS_DIR "/models/House/House.jpeg");
         textures["house"] = texture;
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/images/common/moon.jpg");
+        our::texture_utils::loadImage(texture, ASSETS_DIR "/images/common/moon.jpg");
         textures["moon"] = texture;
 
         GLuint rt_levels = glm::floor(glm::log2(glm::max<float>(rt_size.x, rt_size.y))) + 1;
@@ -102,7 +102,7 @@ class FrameBufferApplication : public our::Application {
         textures["depth_rt"] = texture;
 
         meshes["house"] = std::make_unique<our::Mesh>();
-        our::mesh_utils::loadOBJ(*(meshes["house"]), "assets/models/House/House.obj");
+        our::mesh_utils::loadOBJ(*(meshes["house"]), ASSETS_DIR "/models/House/House.obj");
         meshes["plane"] = std::make_unique<our::Mesh>();
         our::mesh_utils::Plane(*(meshes["plane"]), {1, 1}, false, {0, 0, 0}, {1, 1}, {0, 0}, {100, 100});
         meshes["sphere"] = std::make_unique<our::Mesh>();
@@ -134,8 +134,8 @@ class FrameBufferApplication : public our::Application {
 
         internal_camera_controller.initialize(this, &internal_camera);
 
-        root = loadSceneGraph("assets/data/ex26_frame_buffer/external.json");
-        internal_root = loadSceneGraph("assets/data/ex23_sampler_objects/scene.json");
+        root = loadSceneGraph(ASSETS_DIR "/data/ex26_frame_buffer/external.json");
+        internal_root = loadSceneGraph(ASSETS_DIR "/data/ex23_sampler_objects/scene.json");
 
         glGenFramebuffers(1, &frame_buffer);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame_buffer);

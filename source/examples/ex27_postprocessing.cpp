@@ -100,20 +100,20 @@ class PostProcessingApplication : public our::Application {
 
     void onInitialize() override {
         program.create();
-        program.attach("assets/shaders/ex22_texture_sampling/transform.vert", GL_VERTEX_SHADER);
-        program.attach("assets/shaders/ex22_texture_sampling/texture.frag", GL_FRAGMENT_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex22_texture_sampling/transform.vert", GL_VERTEX_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex22_texture_sampling/texture.frag", GL_FRAGMENT_SHADER);
         program.link();
         blit.effect_program.create();
-        blit.effect_program.attach("assets/shaders/ex27_postprocessing/fullscreen_triangle.vert", GL_VERTEX_SHADER);
-        blit.effect_program.attach("assets/shaders/ex27_postprocessing/blit.frag", GL_FRAGMENT_SHADER);
+        blit.effect_program.attach(ASSETS_DIR "/shaders/ex27_postprocessing/fullscreen_triangle.vert", GL_VERTEX_SHADER);
+        blit.effect_program.attach(ASSETS_DIR "/shaders/ex27_postprocessing/blit.frag", GL_FRAGMENT_SHADER);
         blit.effect_program.link();
         distortion.effect_program.create();
-        distortion.effect_program.attach("assets/shaders/ex27_postprocessing/fullscreen_triangle.vert", GL_VERTEX_SHADER);
-        distortion.effect_program.attach("assets/shaders/ex27_postprocessing/distortion.frag", GL_FRAGMENT_SHADER);
+        distortion.effect_program.attach(ASSETS_DIR "/shaders/ex27_postprocessing/fullscreen_triangle.vert", GL_VERTEX_SHADER);
+        distortion.effect_program.attach(ASSETS_DIR "/shaders/ex27_postprocessing/distortion.frag", GL_FRAGMENT_SHADER);
         distortion.effect_program.link();
         fog.effect_program.create();
-        fog.effect_program.attach("assets/shaders/ex27_postprocessing/fullscreen_triangle.vert", GL_VERTEX_SHADER);
-        fog.effect_program.attach("assets/shaders/ex27_postprocessing/fog.frag", GL_FRAGMENT_SHADER);
+        fog.effect_program.attach(ASSETS_DIR "/shaders/ex27_postprocessing/fullscreen_triangle.vert", GL_VERTEX_SHADER);
+        fog.effect_program.attach(ASSETS_DIR "/shaders/ex27_postprocessing/fog.frag", GL_FRAGMENT_SHADER);
         fog.effect_program.link();
 
         GLuint texture;
@@ -122,13 +122,13 @@ class PostProcessingApplication : public our::Application {
         our::texture_utils::checkerBoard(texture, {256, 256}, {128, 128}, {255, 255, 255, 255}, {16, 16, 16, 255});
         textures["checkerboard"] = texture;
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/models/House/House.jpeg");
+        our::texture_utils::loadImage(texture, ASSETS_DIR "/models/House/House.jpeg");
         textures["house"] = texture;
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/images/common/moon.jpg");
+        our::texture_utils::loadImage(texture, ASSETS_DIR "/images/common/moon.jpg");
         textures["moon"] = texture;
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/images/ex27_postprocessing/water-normal.png");
+        our::texture_utils::loadImage(texture, ASSETS_DIR "/images/ex27_postprocessing/water-normal.png");
         textures["water-normal"] = texture;
 
         int width, height;
@@ -145,7 +145,7 @@ class PostProcessingApplication : public our::Application {
         textures["depth_rt"] = texture;
 
         meshes["house"] = std::make_unique<our::Mesh>();
-        our::mesh_utils::loadOBJ(*(meshes["house"]), "assets/models/House/House.obj");
+        our::mesh_utils::loadOBJ(*(meshes["house"]), ASSETS_DIR "/models/House/House.obj");
         meshes["plane"] = std::make_unique<our::Mesh>();
         our::mesh_utils::Plane(*(meshes["plane"]), {1, 1}, false, {0, 0, 0}, {1, 1}, {0, 0}, {100, 100});
         meshes["sphere"] = std::make_unique<our::Mesh>();
@@ -172,7 +172,7 @@ class PostProcessingApplication : public our::Application {
 
         camera_controller.initialize(this, &camera);
 
-        root = loadSceneGraph("assets/data/ex23_sampler_objects/scene.json");
+        root = loadSceneGraph(ASSETS_DIR "/data/ex23_sampler_objects/scene.json");
 
         glGenFramebuffers(1, &frame_buffer);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame_buffer);

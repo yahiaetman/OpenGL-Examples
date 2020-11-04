@@ -50,8 +50,8 @@ class RayCastingApplication : public our::Application {
 
     void onInitialize() override {
         program.create();
-        program.attach("assets/shaders/ex11_transformation/transform.vert", GL_VERTEX_SHADER);
-        program.attach("assets/shaders/ex11_transformation/tint.frag", GL_FRAGMENT_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex11_transformation/transform.vert", GL_VERTEX_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex11_transformation/tint.frag", GL_FRAGMENT_SHADER);
         program.link();
 
         our::mesh_utils::Cuboid(model, true);

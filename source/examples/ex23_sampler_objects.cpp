@@ -76,8 +76,8 @@ class SamplerObjectsApplication : public our::Application {
 
     void onInitialize() override {
         program.create();
-        program.attach("assets/shaders/ex22_texture_sampling/transform.vert", GL_VERTEX_SHADER);
-        program.attach("assets/shaders/ex22_texture_sampling/texture.frag", GL_FRAGMENT_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex22_texture_sampling/transform.vert", GL_VERTEX_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex22_texture_sampling/texture.frag", GL_FRAGMENT_SHADER);
         program.link();
 
         GLuint texture;
@@ -87,15 +87,15 @@ class SamplerObjectsApplication : public our::Application {
         textures["checkerboard"] = texture;
 
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/models/House/House.jpeg");
+        our::texture_utils::loadImage(texture, ASSETS_DIR "/models/House/House.jpeg");
         textures["house"] = texture;
 
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/images/common/moon.jpg");
+        our::texture_utils::loadImage(texture, ASSETS_DIR "/images/common/moon.jpg");
         textures["moon"] = texture;
 
         meshes["house"] = std::make_unique<our::Mesh>();
-        our::mesh_utils::loadOBJ(*(meshes["house"]), "assets/models/House/House.obj");
+        our::mesh_utils::loadOBJ(*(meshes["house"]), ASSETS_DIR "/models/House/House.obj");
         meshes["plane"] = std::make_unique<our::Mesh>();
         our::mesh_utils::Plane(*(meshes["plane"]), {1, 1}, false, {0, 0, 0}, {1, 1}, {0, 0}, {100, 100});
         meshes["sphere"] = std::make_unique<our::Mesh>();
@@ -114,7 +114,7 @@ class SamplerObjectsApplication : public our::Application {
         camera_controller.initialize(this, &camera);
         camera_controller.setFieldOfViewSensitivity(0.05f );
 
-        std::ifstream file_in("assets/data/ex23_sampler_objects/scene.json");
+        std::ifstream file_in(ASSETS_DIR "/data/ex23_sampler_objects/scene.json");
         nlohmann::json json;
         file_in >> json;
         file_in.close();

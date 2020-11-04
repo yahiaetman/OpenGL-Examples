@@ -14,8 +14,8 @@ class AttributesApplication : public our::Application {
 
     void onInitialize() override {
         program.create();
-        program.attach("assets/shaders/ex05_attributes/attribute_position.vert", GL_VERTEX_SHADER);
-        program.attach("assets/shaders/ex02_shader_introduction/red.frag", GL_FRAGMENT_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex05_attributes/attribute_position.vert", GL_VERTEX_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex02_shader_introduction/red.frag", GL_FRAGMENT_SHADER);
         program.link();
 
         glGenVertexArrays(1, &vertex_array);

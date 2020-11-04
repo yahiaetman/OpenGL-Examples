@@ -110,12 +110,12 @@ class BlendingApplication : public our::Application {
 
     void onInitialize() override {
         default_program.create();
-        default_program.attach("assets/shaders/ex22_texture_sampling/transform.vert", GL_VERTEX_SHADER);
-        default_program.attach("assets/shaders/ex22_texture_sampling/texture.frag", GL_FRAGMENT_SHADER);
+        default_program.attach(ASSETS_DIR "/shaders/ex22_texture_sampling/transform.vert", GL_VERTEX_SHADER);
+        default_program.attach(ASSETS_DIR "/shaders/ex22_texture_sampling/texture.frag", GL_FRAGMENT_SHADER);
         default_program.link();
         alpha_test_program.create();
-        alpha_test_program.attach("assets/shaders/ex22_texture_sampling/transform.vert", GL_VERTEX_SHADER);
-        alpha_test_program.attach("assets/shaders/ex25_blending/alpha_test.frag", GL_FRAGMENT_SHADER);
+        alpha_test_program.attach(ASSETS_DIR "/shaders/ex22_texture_sampling/transform.vert", GL_VERTEX_SHADER);
+        alpha_test_program.attach(ASSETS_DIR "/shaders/ex25_blending/alpha_test.frag", GL_FRAGMENT_SHADER);
         alpha_test_program.link();
 
 
@@ -127,19 +127,19 @@ class BlendingApplication : public our::Application {
         our::texture_utils::checkerBoard(texture, {256,256}, {128,128}, {255, 255, 255, 255}, {16, 16, 16, 255});
         textures["checkerboard"] = texture;
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/images/common/color-grid.png");
+        our::texture_utils::loadImage(texture, ASSETS_DIR "/images/common/color-grid.png");
         textures["color-grid"] = texture;
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/images/common/moon.jpg");
+        our::texture_utils::loadImage(texture, ASSETS_DIR "/images/common/moon.jpg");
         textures["moon"] = texture;
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/images/ex25_blending/glass-panels.png");
+        our::texture_utils::loadImage(texture, ASSETS_DIR "/images/ex25_blending/glass-panels.png");
         textures["glass-panels"] = texture;
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/images/ex25_blending/metal.png");
+        our::texture_utils::loadImage(texture, ASSETS_DIR "/images/ex25_blending/metal.png");
         textures["metal"] = texture;
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/images/ex25_blending/fog.png");
+        our::texture_utils::loadImage(texture, ASSETS_DIR "/images/ex25_blending/fog.png");
         textures["fog"] = texture;
 
         meshes["cube"] = std::make_shared<our::Mesh>();
@@ -166,7 +166,7 @@ class BlendingApplication : public our::Application {
         camera_controller.initialize(this, &camera);
         camera_controller.setFieldOfViewSensitivity(0.05f );
 
-        std::ifstream file_in("assets/data/ex25_blending/scene.json");
+        std::ifstream file_in(ASSETS_DIR "/data/ex25_blending/scene.json");
         nlohmann::json json;
         file_in >> json;
         file_in.close();

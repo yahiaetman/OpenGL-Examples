@@ -13,8 +13,8 @@ class VaryingsApplication : public our::Application {
 
     void onInitialize() override {
         program.create();
-        program.attach("assets/shaders/ex04_varyings/colored_triangle.vert", GL_VERTEX_SHADER);
-        program.attach("assets/shaders/ex04_varyings/varying_color.frag", GL_FRAGMENT_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex04_varyings/colored_triangle.vert", GL_VERTEX_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex04_varyings/varying_color.frag", GL_FRAGMENT_SHADER);
         program.link();
 
         glGenVertexArrays(1, &vertex_array);

@@ -94,8 +94,8 @@ class ShaderIntroductionApplication : public our::Application {
         program = glCreateProgram();    // We ask GL to create a program for us and return a uint that we will use it by.
                                         // (act as a pointer to the created program).
 
-        attachShader(program, "assets/shaders/ex02_shader_introduction/triangle.vert", GL_VERTEX_SHADER);   // read the vertex shader and attach it to the program.
-        attachShader(program, "assets/shaders/ex02_shader_introduction/red.frag", GL_FRAGMENT_SHADER);      // read the fragment shader and attach it to the program.
+        attachShader(program, ASSETS_DIR "/shaders/ex02_shader_introduction/triangle.vert", GL_VERTEX_SHADER);   // read the vertex shader and attach it to the program.
+        attachShader(program, ASSETS_DIR "/shaders/ex02_shader_introduction/red.frag", GL_FRAGMENT_SHADER);      // read the fragment shader and attach it to the program.
         
         glLinkProgram(program);                     // Link the vertex and fragment shader together.
         checkProgramLinkingErrors(program);         // Check if there is any link errors between the fragment shader and vertex shader.

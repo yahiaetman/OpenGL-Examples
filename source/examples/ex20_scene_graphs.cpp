@@ -63,8 +63,8 @@ class SceneGraphApplication : public our::Application {
 
     void onInitialize() override {
         program.create();
-        program.attach("assets/shaders/ex11_transformation/transform.vert", GL_VERTEX_SHADER);
-        program.attach("assets/shaders/ex11_transformation/tint.frag", GL_FRAGMENT_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex11_transformation/transform.vert", GL_VERTEX_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex11_transformation/tint.frag", GL_FRAGMENT_SHADER);
         program.link();
 
         meshes["cube"] = std::make_unique<our::Mesh>();
@@ -84,9 +84,9 @@ class SceneGraphApplication : public our::Application {
 
         controller.initialize(this, &camera);
 
-        roots["simple"] = loadSceneGraph("assets/data/ex20_scene_graphs/simple.json");
-        roots["solar-system"] = loadSceneGraph("assets/data/ex20_scene_graphs/solar-system.json");
-        roots["human"] = loadSceneGraph("assets/data/ex20_scene_graphs/human.json");
+        roots["simple"] = loadSceneGraph(ASSETS_DIR "/data/ex20_scene_graphs/simple.json");
+        roots["solar-system"] = loadSceneGraph(ASSETS_DIR "/data/ex20_scene_graphs/solar-system.json");
+        roots["human"] = loadSceneGraph(ASSETS_DIR "/data/ex20_scene_graphs/human.json");
         current_root_name = "simple";
 
         glEnable(GL_DEPTH_TEST);

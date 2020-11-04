@@ -18,8 +18,8 @@ class UniformsApplication : public our::Application {
 
     void onInitialize() override {
         program.create();
-        program.attach("assets/shaders/ex03_uniforms/quad.vert", GL_VERTEX_SHADER);
-        program.attach("assets/shaders/ex03_uniforms/uniform_color.frag", GL_FRAGMENT_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex03_uniforms/quad.vert", GL_VERTEX_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex03_uniforms/uniform_color.frag", GL_FRAGMENT_SHADER);
         program.link();
 
         glGenVertexArrays(1, &vertex_array);

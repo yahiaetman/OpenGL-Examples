@@ -45,8 +45,8 @@ class TextureSamplingApplication : public our::Application {
 
     void onInitialize() override {
         program.create();
-        program.attach("assets/shaders/ex22_texture_sampling/transform.vert", GL_VERTEX_SHADER);
-        program.attach("assets/shaders/ex22_texture_sampling/texture.frag", GL_FRAGMENT_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex22_texture_sampling/transform.vert", GL_VERTEX_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex22_texture_sampling/texture.frag", GL_FRAGMENT_SHADER);
         program.link();
 
         model.create({
@@ -67,15 +67,15 @@ class TextureSamplingApplication : public our::Application {
         textures["checkerboard"] = texture;
 
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/images/common/color-grid.png");
+        our::texture_utils::loadImage(texture, ASSETS_DIR "/images/common/color-grid.png");
         textures["color-grid"] = texture;
 
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/images/common/moon.jpg");
+        our::texture_utils::loadImage(texture, ASSETS_DIR "/images/common/moon.jpg");
         textures["moon"] = texture;
 
         glGenTextures(1, &texture);
-        our::texture_utils::loadImage(texture, "assets/images/common/monarch.png");
+        our::texture_utils::loadImage(texture, ASSETS_DIR "/images/common/monarch.png");
         textures["monarch"] = texture;
 
         current_texture_name = "color-grid";

@@ -25,8 +25,8 @@ class MeshApplication : public our::Application {
 
     void onInitialize() override {
         program.create();
-        program.attach("assets/shaders/ex06_multiple_attributes/multiple_attributes.vert", GL_VERTEX_SHADER);
-        program.attach("assets/shaders/ex04_varyings/varying_color.frag", GL_FRAGMENT_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex06_multiple_attributes/multiple_attributes.vert", GL_VERTEX_SHADER);
+        program.attach(ASSETS_DIR "/shaders/ex04_varyings/varying_color.frag", GL_FRAGMENT_SHADER);
         program.link();
 
         quad.create({
@@ -48,7 +48,7 @@ class MeshApplication : public our::Application {
             2, 3, 0
         },GL_STATIC_DRAW);
 
-        our::mesh_utils::loadOBJ(model, "assets/models/Suzanne/Suzanne.obj");
+        our::mesh_utils::loadOBJ(model, ASSETS_DIR "/models/Suzanne/Suzanne.obj");
 
     }
 
