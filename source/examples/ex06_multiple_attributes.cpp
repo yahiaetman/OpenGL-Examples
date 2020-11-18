@@ -32,6 +32,7 @@ class AttributesApplication : public our::Application {
 
         glBufferData(GL_ARRAY_BUFFER, 3*3*sizeof(float), positions, GL_STATIC_DRAW);
 
+        // Setting attribute for (0) the postion.
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, (void*)0);
         glEnableVertexAttribArray(0);
 
@@ -46,6 +47,7 @@ class AttributesApplication : public our::Application {
 
         glBufferData(GL_ARRAY_BUFFER, 3*4*sizeof(glm::uint8), colors, GL_STATIC_DRAW);
 
+        // Setting attribute for (1) the color, same as before replicating the process changing the size to 4*sizeof(glm::uint8)
         glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, true, 0, (void*)0);
         glEnableVertexAttribArray(1);
 

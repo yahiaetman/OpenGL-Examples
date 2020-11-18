@@ -13,10 +13,10 @@ This repository contains examples of how to use OpenGL with C++17. It is made fo
 | ---- | ----------- | ------ |
 | Empty Window | [ex01_empty_window.cpp](source/examples/ex01_empty_window.cpp) | :white_check_mark: |
 | Shader Introduction | [ex02_shader_introduction.cpp](source/examples/ex02_shader_introduction.cpp) | :white_check_mark: |
-| Uniforms | [ex03_uniforms.cpp](source/examples/ex03_uniforms.cpp) |  |
-| Varyings | [ex04_varyings.cpp](source/examples/ex04_varyings.cpp) |  |
-| Attributes | [ex05_attributes.cpp](source/examples/ex05_attributes.cpp) |  |
-| Multiple Attributes | [ex06_multiple_attributes.cpp](source/examples/ex06_multiple_attributes.cpp) |  |
+| Uniforms | [ex03_uniforms.cpp](source/examples/ex03_uniforms.cpp) | :white_check_mark: |
+| Varyings | [ex04_varyings.cpp](source/examples/ex04_varyings.cpp) | :white_check_mark: |
+| Attributes | [ex05_attributes.cpp](source/examples/ex05_attributes.cpp) | :white_check_mark: |
+| Multiple Attributes | [ex06_multiple_attributes.cpp](source/examples/ex06_multiple_attributes.cpp) | :white_check_mark: |
 | Interleaved Attributes | [ex07_interleaved_attributes.cpp](source/examples/ex07_interleaved_attributes.cpp) |  |
 | Elements | [ex08_elements.cpp](source/examples/ex08_elements.cpp) |  |
 | Stream | [ex09_stream.cpp](source/examples/ex09_stream.cpp) |  |

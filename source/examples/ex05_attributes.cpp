@@ -40,7 +40,11 @@ class AttributesApplication : public our::Application {
         };
 #endif
 
-        glBufferData(GL_ARRAY_BUFFER, 3*3*sizeof(float), positions, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, 3*3*sizeof(float), positions, GL_STATIC_DRAW);        // function specifically targeted to copy user-defined data into the currently bound buffer.
+                                                                                            // Its first argument is the type of the buffer we want to copy data into:
+                                                                                            // the vertex buffer object currently bound to the GL_ARRAY_BUFFER target.
+                                                                                            // The second argument specifies the size of the data (in bytes) we want to pass to the buffer;
+                                                                                            // a simple sizeof of the vertex data suffices. The third parameter is the actual data we want to send.
 
         GLuint position_attribute_location = glGetAttribLocation(program, "position");
         std::cout << "Position Attribute Location: " << position_attribute_location << std:: endl;
