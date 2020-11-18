@@ -94,7 +94,7 @@ class DepthTestingAndFaceCullingApplication : public our::Application {
         if(enable_depth_test) glEnable(GL_DEPTH_TEST); else glDisable(GL_DEPTH_TEST);
         glDepthFunc(depth_function);
 
-        if(enable_face_culling) glEnable(GL_CULL_FACE); else glDisable(GL_CULL_FACE);
+        if(enable_face_culling) glEnable(GL_CULL_FACE); else glDisable(GL_CULL_FACE);       // This line enables face culling.       
         glCullFace(culled_face);
         glFrontFace(front_face_winding);
 

@@ -23,6 +23,7 @@ class TransformationApplication : public our::Application {
         program.attach("assets/shaders/ex11_transformation/tint.frag", GL_FRAGMENT_SHADER);
         program.link();
 
+        // Create a mesh quad with colors passing the elements
         quad.create({our::setup_buffer_accessors<our::ColoredVertex>});
         quad.setVertexData<our::ColoredVertex>(0, {
                 {{-0.5, -0.5, 0},{255,   0,   0, 255}},
@@ -42,6 +43,7 @@ class TransformationApplication : public our::Application {
         glClear(GL_COLOR_BUFFER_BIT);
         glUseProgram(program);
 
+        // Set the uniform data of transform as a matrix for the vertex shader.
         program.set("transform", transformation_matrix);
         program.set("tint", glm::vec4(1,1,1,1));
 

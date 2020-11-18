@@ -21,12 +21,12 @@ This repository contains examples of how to use OpenGL with C++17. It is made fo
 | Elements | [ex08_elements.cpp](source/examples/ex08_elements.cpp) |  |
 | Stream | [ex09_stream.cpp](source/examples/ex09_stream.cpp) |  |
 | Model Loading | [ex10_model_loading.cpp](source/examples/ex10_model_loading.cpp) |  |
-| Transformation | [ex11_transformation.cpp](source/examples/ex11_transformation.cpp) |  |
-| Composition | [ex12_composition.cpp](source/examples/ex12_composition.cpp) |  |
-| Camera | [ex13_camera.cpp](source/examples/ex13_camera.cpp) |  |
-| Projection | [ex14_projection.cpp](source/examples/ex14_projection.cpp) |  |
-| Depth Testing | [ex15_depth_testing.cpp](source/examples/ex15_depth_testing.cpp) |  |
-| Face Culling | [ex16_face_culling.cpp](source/examples/ex16_face_culling.cpp) |  |
+| Transformation | [ex11_transformation.cpp](source/examples/ex11_transformation.cpp) | :white_check_mark: |
+| Composition | [ex12_composition.cpp](source/examples/ex12_composition.cpp) | :white_check_mark: |
+| Camera | [ex13_camera.cpp](source/examples/ex13_camera.cpp) | :white_check_mark: |
+| Projection | [ex14_projection.cpp](source/examples/ex14_projection.cpp) | :white_check_mark: |
+| Depth Testing | [ex15_depth_testing.cpp](source/examples/ex15_depth_testing.cpp) | :white_check_mark: |
+| Face Culling | [ex16_face_culling.cpp](source/examples/ex16_face_culling.cpp) | :white_check_mark: |
 | Viewports & Scissors | [ex17_viewports_and_scissors.cpp](source/examples/ex17_viewports_and_scissors.cpp) |  |
 | Camera Stacking | [ex18_camera_stacking.cpp](source/examples/ex18_camera_stacking.cpp) |  |
 | Ray Casting | [ex19_ray_casting.cpp](source/examples/ex19_ray_casting.cpp) |  |

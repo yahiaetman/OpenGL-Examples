@@ -51,6 +51,9 @@ class CompositionApplication : public our::Application {
         glClearColor(0, 0, 0, 0);
     }
 
+    // We compose the transformation according to the array set by the GUI.
+    // It multiplies the selected matrix type by the last matrix value.
+    // The start value of the matrix is identity.
     glm::mat4 compose(){
         glm::mat4 transformation_matrix(1.0f);
         for(const auto& transformation : transformations){

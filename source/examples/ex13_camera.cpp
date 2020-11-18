@@ -8,6 +8,7 @@
 
 #include <glm/gtx/euler_angles.hpp>
 
+// This struct contains the data needed to transform (translate/rotate/scale) an object.
 struct Transform {
     glm::vec3 translation, rotation, scale;
 
@@ -30,7 +31,7 @@ class CameraApplication : public our::Application {
     our::Mesh quad;
 
     std::vector<Transform> objects;
-    Transform camera;
+    Transform camera;                       // The camera is represented by a transform.
 
     our::WindowConfiguration getWindowConfiguration() override {
         return { "Camera (Simple)", {1280, 720}, false };
@@ -54,6 +55,7 @@ class CameraApplication : public our::Application {
                                             2, 3, 0
                                     },GL_STATIC_DRAW);
 
+        // Array of transforms that render the same quad multiple times with different position/rotation/scale.
         objects.push_back({ {0,-100,0}, {0,0,0}, {500,20,1} });
         objects.push_back({ {-200,100,0}, {0,0,0}, {30,30,1} });
         objects.push_back({ {0,100,0}, {0,0,glm::pi<float>()/4}, {30,30,1} });
@@ -61,7 +63,8 @@ class CameraApplication : public our::Application {
 
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
-        camera = Transform({0,0,0},{0, 0, 0},{width, height, 1});
+
+        camera = Transform({0,0,0},{0, 0, 0},{width, height, 1});               // Camera is at origin, with no rotations, with scale equal to the screen size.
 
         glClearColor(0, 0, 0, 0);
     }
@@ -74,6 +77,7 @@ class CameraApplication : public our::Application {
 
         glm::mat4 camera_matrix = glm::inverse(camera.to_mat4());
 
+        // Drawing the same quad data using multiple transform data.
         for(const auto& object : objects) {
             program.set("transform", camera_matrix * object.to_mat4());
             quad.draw();

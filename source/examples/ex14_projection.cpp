@@ -30,11 +30,14 @@ class CameraProjectionApplication : public our::Application {
 
     std::vector<Transform> objects;
 
+    // This struct contains the data needed to create camera view matrix.
     struct {
         glm::vec3 eye;
         glm::vec3 center;
         glm::vec3 up;
     } camera_view;
+
+    // This struct contains the data how the projection will be done (prespective/orthographic).
     struct {
         bool is_perspective;
         // Common camera projection properties
@@ -56,18 +59,22 @@ class CameraProjectionApplication : public our::Application {
         program.attach("assets/shaders/ex11_transformation/tint.frag", GL_FRAGMENT_SHADER);
         program.link();
 
+        // Populate model intance with cuboid data.
         our::mesh_utils::Cuboid(model, true);
 
+        // Array of transforms to draw the same cuboid with different (position/rotation/scale).
         objects.push_back({ {0,-1,0}, {0,0,0}, {7,2,7} });
         objects.push_back({ {-2,1,-2}, {0,0,0}, {2,2,2} });
         objects.push_back({ {2,1,-2}, {0,0,0}, {2,2,2} });
         objects.push_back({ {-2,1,2}, {0,0,0}, {2,2,2} });
         objects.push_back({ {2,1,2}, {0,0,0}, {2,2,2} });
 
+        // Set the camera view matrix data.
         camera_view.eye = {10, 10, 10};
         camera_view.center = {0, 0, 0};
         camera_view.up = {0, 1, 0};
 
+        // Set the camera projection matrix data.
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
         camera_projection.is_perspective = true;
@@ -86,6 +93,7 @@ class CameraProjectionApplication : public our::Application {
 
         program.set("tint", glm::vec4(1,1,1,1));
 
+        // Creates the view and projection matrix using the set data. 
         glm::mat4 view_matrix = glm::lookAt(camera_view.eye, camera_view.center, camera_view.up);
         glm::mat4 projection_matrix;
         if(camera_projection.is_perspective){
@@ -98,6 +106,7 @@ class CameraProjectionApplication : public our::Application {
 
         glm::mat4 camera_matrix = projection_matrix * view_matrix;
 
+        // We use the created camera matrix to render the object.
         for(const auto& object : objects) {
             program.set("transform", camera_matrix * object.to_mat4());
             model.draw();

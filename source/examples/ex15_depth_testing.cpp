@@ -75,15 +75,15 @@ class DepthTestingApplication : public our::Application {
     void onDraw(double deltaTime) override {
         camera_controller.update(deltaTime);
 
-        if(enable_depth_test) glEnable(GL_DEPTH_TEST); else glDisable(GL_DEPTH_TEST);
+        if(enable_depth_test) glEnable(GL_DEPTH_TEST); else glDisable(GL_DEPTH_TEST);       // This line enables depth testing.
         glDepthFunc(depth_function);
 
-        glClearDepth(clear_depth);
+        glClearDepth(clear_depth);                              // Specifies the depth value used when the depth buffer is cleared. The initial value is 1.
 
         glDepthMask(depth_mask);
         glColorMask(color_mask.r, color_mask.g, color_mask.b, color_mask.a);
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);     // Clearing the depth buffer is important now as we are drawing to it each frame.
         glUseProgram(program);
 
         program.set("tint", glm::vec4(1,1,1,1));
