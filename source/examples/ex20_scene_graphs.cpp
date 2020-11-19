@@ -1,5 +1,6 @@
 #include <application.hpp>
 #include <shader.hpp>
+#include <utility>
 #include <imgui-utils/utils.hpp>
 
 #include <mesh/mesh.hpp>
@@ -82,7 +83,7 @@ namespace glm {
 
 // The struct holds the Transform data.
 struct Transform {
-    // This vec4 is multiplied by the original color.
+    // This vec4 is multiplied by the original color in the fragment shader.
     glm::vec4 tint;
     // Vectors to transform data. 
     glm::vec3 translation, rotation, scale;
@@ -90,14 +91,16 @@ struct Transform {
     std::unordered_map<std::string, std::shared_ptr<Transform>> children;
 
 
-    Transform(
+    explicit Transform(
             const glm::vec4& tint = {1,1,1,1},
             const glm::vec3& translation = {0,0,0},
             const glm::vec3& rotation = {0,0,0},
             const glm::vec3& scale = {1,1,1},
-            const std::optional<std::string>& mesh = std::nullopt
-                    ): tint(tint), translation(translation), rotation(rotation), scale(scale), mesh(mesh) {}
+            std::optional<std::string> mesh = std::nullopt
+                    ): tint(tint), translation(translation), rotation(rotation), scale(scale), mesh(std::move(mesh)) {}
 
+    // Create a matrix from the translation, rotation and scale members
+    // The matrix transforms from this node's local space to the parent's local space
     [[nodiscard]] glm::mat4 to_mat4() const {
         return glm::translate(glm::mat4(1.0f), translation) *
                 glm::yawPitchRoll(rotation.y, rotation.x, rotation.z) *
@@ -113,12 +116,13 @@ class SceneGraphApplication : public our::Application {
     // meshes["cube"] => contains the mesh data of a cube.
     std::unordered_map<std::string, std::unique_ptr<our::Mesh>> meshes;
 
-    // This unordered map keep track of all our meshes and saves them by name.
+    // This unordered map keep track of all our scene graphs and saves them by name.
     std::unordered_map<std::string, std::shared_ptr<Transform>> roots;
 
-    // This value stores the name of the root of the whole scene.
+    // This value stores the name of the current root of the scene graph that we will render.
     std::string current_root_name;
 
+    // A camera and a camera controller to view the scene
     our::Camera camera;
     our::FlyCameraController controller;
 
@@ -157,6 +161,7 @@ class SceneGraphApplication : public our::Application {
         roots["human"] = loadSceneGraph("assets/data/ex20_scene_graphs/human.json");
         current_root_name = "simple";
 
+        // Set the render state
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
 
@@ -207,7 +212,7 @@ class SceneGraphApplication : public our::Application {
     // This function draws the models in a recursive manner.
     // It starts with the parent node and draw each child,
     // passing the transform matrix to the children to
-    // cassacade the transformation effect.
+    // cascade the transformation effect.
     void drawNode(const std::shared_ptr<Transform>& node, const glm::mat4& parent_transform_matrix){
         glm::mat4 transform_matrix = parent_transform_matrix * node->to_mat4();
         if(node->mesh.has_value()){
@@ -230,6 +235,8 @@ class SceneGraphApplication : public our::Application {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // To draw, just call "drawNode" and give it the current root
+        // Note the we give it the camera VP matrix such that every matrix generated in "drawNode" transforms to the homogenous clip space.
         drawNode(roots[current_root_name], camera.getVPMatrix());
 
     }

@@ -30,7 +30,7 @@ This repository contains examples of how to use OpenGL with C++17. It is made fo
 | Viewports & Scissors | [ex17_viewports_and_scissors.cpp](source/examples/ex17_viewports_and_scissors.cpp) |  |
 | Camera Stacking | [ex18_camera_stacking.cpp](source/examples/ex18_camera_stacking.cpp) |  |
 | Ray Casting | [ex19_ray_casting.cpp](source/examples/ex19_ray_casting.cpp) |  |
-| Scene Graphs | [ex20_scene_graphs.cpp](source/examples/ex20_scene_graphs.cpp) |  |
+| Scene Graphs | [ex20_scene_graphs.cpp](source/examples/ex20_scene_graphs.cpp) | :white_check_mark: |
 | Texture | [ex21_texture.cpp](source/examples/ex21_texture.cpp) |  |
 | Texture Sampling | [ex22_texture_sampling.cpp](source/examples/ex22_texture_sampling.cpp) |  |
 | Sampler Objects | [ex23_sampler_objects.cpp](source/examples/ex23_sampler_objects.cpp) |  |
@@ -43,6 +43,28 @@ This repository contains examples of how to use OpenGL with C++17. It is made fo
 | Light Array | [ex30_light_array.cpp](source/examples/ex30_light_array.cpp) |  |
 | Multi-Pass Lighting | [ex31_light_multipass.cpp](source/examples/ex31_light_multipass.cpp) |  |
 | Textured Material | [ex32_textured_material.cpp](source/examples/ex32_textured_material.cpp) |  |
+
+## Extra Resources
+
+* Tutorials
+    * [Learn OpenGL](https://learnopengl.com/)
+    * [Open.GL](https://open.gl/introduction)
+    * [OpenGL-Tutorial](http://www.opengl-tutorial.org/)
+    * [The Book of Shaders](https://thebookofshaders.com/)
+* References
+    * [OpenGL Wiki](https://www.khronos.org/opengl/wiki/)
+    * [OpenGL Reference](https://www.khronos.org/registry/OpenGL-Refpages/gl4/)
+
+## Included Libraries
+
+- [glfw 3.3](https://github.com/glfw/glfw)
+- [glad 2](https://github.com/Dav1dde/glad/tree/glad2)
+- [glm 0.9.9.8](https://github.com/g-truc/glm)
+- [imgui v1.78](https://github.com/ocornut/imgui)
+- [json 3.9.1](https://github.com/nlohmann/json)
+- [stb](https://github.com/nothings/stb)
+- [tinyobjloader v1.0.6](https://github.com/tinyobjloader/tinyobjloader)
+- [tinygltf v2.4.0](https://github.com/syoyo/tinygltf)
 
 ## License
  [MIT License](LICENSE.md)
