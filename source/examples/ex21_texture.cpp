@@ -32,6 +32,21 @@ class TextureApplication : public our::Application {
 
         {
             glGenTextures(1, &texture);
+            uint8_t pixel_data[] = {
+                    255,   0,   0, 255,
+                      0, 255,   0, 255,
+                      0,   0, 255, 255,
+                    255, 255,   0, 255,
+            };
+            glBindTexture(GL_TEXTURE_2D, texture);
+            glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixel_data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
+        textures["colors"] = texture;
+
+        {
+            glGenTextures(1, &texture);
             using color = glm::vec<4, glm::uint8, glm::defaultp>;
             const color W = {255, 255, 255, 255}, Y = {255, 255, 0, 255},
                     B = {0, 0, 0, 255};
@@ -99,6 +114,10 @@ class TextureApplication : public our::Application {
         glGenTextures(1, &texture);
         our::texture_utils::loadImage(texture, "assets/images/common/moon.jpg");
         textures["moon"] = texture;
+
+        glGenTextures(1, &texture);
+        our::texture_utils::loadImage(texture, "assets/images/common/monarch.png");
+        textures["monarch"] = texture;
 
         current_texture_name = "color-grid";
 

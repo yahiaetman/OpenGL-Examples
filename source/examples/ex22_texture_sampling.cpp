@@ -63,6 +63,19 @@ class TextureSamplingApplication : public our::Application {
         GLuint texture;
 
         glGenTextures(1, &texture);
+        uint8_t pixel_data[] = {
+                255,   0,   0, 255,
+                0, 255,   0, 255,
+                0,   0, 255, 255,
+                255, 255,   0, 255,
+        };
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixel_data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        textures["colors"] = texture;
+
+        glGenTextures(1, &texture);
         our::texture_utils::checkerBoard(texture, {6,6}, {3,3}, {255, 255, 255, 255}, {64, 64, 64, 255});
         textures["checkerboard"] = texture;
 
