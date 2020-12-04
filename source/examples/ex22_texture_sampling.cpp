@@ -103,6 +103,7 @@ class TextureSamplingApplication : public our::Application {
 
         camera_controller.initialize(this, &camera);
         camera_controller.setFieldOfViewSensitivity(0.05f );
+        camera_controller.setPositionSensitivity(glm::vec3(0.5f));
 
         glClearColor(0, 0, 0, 1);
     }

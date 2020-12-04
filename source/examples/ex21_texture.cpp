@@ -9,7 +9,7 @@
 class TextureApplication : public our::Application {
 
     our::ShaderProgram program;
-    GLuint vertex_array;
+    GLuint vertex_array = 0;
 
     std::unordered_map<std::string, GLuint> textures;
     std::string current_texture_name;
