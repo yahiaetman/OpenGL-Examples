@@ -36,8 +36,8 @@ This repository contains examples of how to use OpenGL with C++17. It is made fo
 | Sampler Objects | [ex23_sampler_objects.cpp](source/examples/ex23_sampler_objects.cpp) | :white_check_mark: |
 | Displacement | [ex24_displacement.cpp](source/examples/ex24_displacement.cpp) | :white_check_mark: |
 | Blending | [ex25_blending.cpp](source/examples/ex25_blending.cpp) | :white_check_mark: |
-| Frame Buffer | [ex26_frame_buffer.cpp](source/examples/ex26_frame_buffer.cpp) |  |
-| Postprocessing | [ex27_postprocessing.cpp](source/examples/ex27_postprocessing.cpp) |  |
+| Frame Buffer | [ex26_frame_buffer.cpp](source/examples/ex26_frame_buffer.cpp) | :white_check_mark: |
+| Postprocessing | [ex27_postprocessing.cpp](source/examples/ex27_postprocessing.cpp) | :white_check_mark: |
 | Multiple Render Targets | [ex28_multiple_render_targets.cpp](source/examples/ex28_multiple_render_targets.cpp) |  |
 | Light | [ex29_light.cpp](source/examples/ex29_light.cpp) |  |
 | Light Array | [ex30_light_array.cpp](source/examples/ex30_light_array.cpp) |  |

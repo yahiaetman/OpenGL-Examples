@@ -48,11 +48,12 @@ struct Transform {
     }
 };
 
+// This is an enum of all the post processing effects we support.
 enum class PostProcessingEffectTypes: int {
-    BLIT,
-    DISTORTION,
-    FOG,
-    ENUM_SIZE
+    BLIT,           // BLIT just transfers the data from the texture to the screen without any processing.
+    DISTORTION,     // This will apply some distortion to our scene texture while rendering it to the screen.
+    FOG,            // This will add fog to the scene.
+    ENUM_SIZE       // This entry is not an effect but it will be used to automatically loop over the enum size.
 };
 
 const char* const PostProcessingEffectTypeNames[] = {
@@ -69,28 +70,29 @@ class PostProcessingApplication : public our::Application {
 
     std::unordered_map<std::string, GLuint> textures;
 
-    GLuint sampler, screen_color_sampler;
+    GLuint sampler = 0, screen_color_sampler = 0;
 
     std::shared_ptr<Transform> root;
 
     our::Camera camera;
     our::FlyCameraController camera_controller;
 
-    GLuint frame_buffer, fullscreen_vertex_array;
+    GLuint frame_buffer = 0, fullscreen_vertex_array = 0;
 
+    // For each post processing effect, we will create a structure to hold its shader and settings for the sake of organization.
     struct {
         our::ShaderProgram effect_program;
-    } blit;
+    } blit{};
     struct {
         our::ShaderProgram effect_program;
         float distortion_power = 0.05f;
-    } distortion;
+    } distortion{};
     struct {
         our::ShaderProgram effect_program;
         glm::vec3 fog_color = {0.75, 0.5, 0.25};
         float fog_power = 1.0f;
         float fog_distance = 10.0f;
-    } fog;
+    } fog{};
     PostProcessingEffectTypes current_effect = PostProcessingEffectTypes::DISTORTION;
 
 
@@ -103,6 +105,7 @@ class PostProcessingApplication : public our::Application {
         program.attach("assets/shaders/ex22_texture_sampling/transform.vert", GL_VERTEX_SHADER);
         program.attach("assets/shaders/ex22_texture_sampling/texture.frag", GL_FRAGMENT_SHADER);
         program.link();
+        // Each effect will have its shader program.
         blit.effect_program.create();
         blit.effect_program.attach("assets/shaders/ex27_postprocessing/fullscreen_triangle.vert", GL_VERTEX_SHADER);
         blit.effect_program.attach("assets/shaders/ex27_postprocessing/blit.frag", GL_FRAGMENT_SHADER);
@@ -128,12 +131,14 @@ class PostProcessingApplication : public our::Application {
         our::texture_utils::loadImage(texture, "assets/images/common/moon.jpg");
         textures["moon"] = texture;
         glGenTextures(1, &texture);
+        // This image will be used to control the distortion.
         our::texture_utils::loadImage(texture, "assets/images/ex27_postprocessing/water-normal.png");
         textures["water-normal"] = texture;
 
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
 
+        // We will create a render target that matches the window size since we will use it to do some full screen effects.
         GLuint rt_levels = glm::floor(glm::log2(glm::max<float>(width, height))) + 1;
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
@@ -162,6 +167,7 @@ class PostProcessingApplication : public our::Application {
         glGenSamplers(1, &screen_color_sampler);
         glSamplerParameteri(screen_color_sampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glSamplerParameteri(screen_color_sampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        // It is common to use edge clamp wrap mode while reading from render targets (If you want to know why, set it to repeat and try the distortion effect and see what happens).
         glSamplerParameteri(screen_color_sampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glSamplerParameteri(screen_color_sampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
@@ -253,6 +259,7 @@ class PostProcessingApplication : public our::Application {
         glBindSampler(0, sampler);
         program.set("sampler", 0);
 
+        // First, we render the scene to the frame buffer
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame_buffer);
 
         glClearColor(0.88,0.65,0.15, 1);
@@ -260,13 +267,16 @@ class PostProcessingApplication : public our::Application {
 
         drawNode(root, camera.getVPMatrix());
 
+        // Then we go back to the window back buffer
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
 
+        // We don't need depth testing while rendering the effect, so we disable it temporarily for the sake of optimization.
         glDisable(GL_DEPTH_TEST);
 
+        // Setup the program and uniforms for our shader effect.
         switch (current_effect) {
             case PostProcessingEffectTypes::BLIT:
                 glUseProgram(blit.effect_program);
@@ -316,6 +326,7 @@ class PostProcessingApplication : public our::Application {
                 std::cerr << "Invalid Effect Option" << std::endl;
         }
 
+        // Then render a fullscreen triangle that applies the post processing effect.
         glBindVertexArray(fullscreen_vertex_array);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         glBindVertexArray(0);
