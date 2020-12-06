@@ -31,11 +31,11 @@ This repository contains examples of how to use OpenGL with C++17. It is made fo
 | Camera Stacking | [ex18_camera_stacking.cpp](source/examples/ex18_camera_stacking.cpp) |  |
 | Ray Casting | [ex19_ray_casting.cpp](source/examples/ex19_ray_casting.cpp) |  |
 | Scene Graphs | [ex20_scene_graphs.cpp](source/examples/ex20_scene_graphs.cpp) | :white_check_mark: |
-| Texture | [ex21_texture.cpp](source/examples/ex21_texture.cpp) |  |
-| Texture Sampling | [ex22_texture_sampling.cpp](source/examples/ex22_texture_sampling.cpp) |  |
-| Sampler Objects | [ex23_sampler_objects.cpp](source/examples/ex23_sampler_objects.cpp) |  |
-| Displacement | [ex24_displacement.cpp](source/examples/ex24_displacement.cpp) |  |
-| Blending | [ex25_blending.cpp](source/examples/ex25_blending.cpp) |  |
+| Texture | [ex21_texture.cpp](source/examples/ex21_texture.cpp) | :white_check_mark: |
+| Texture Sampling | [ex22_texture_sampling.cpp](source/examples/ex22_texture_sampling.cpp) | :white_check_mark: |
+| Sampler Objects | [ex23_sampler_objects.cpp](source/examples/ex23_sampler_objects.cpp) | :white_check_mark: |
+| Displacement | [ex24_displacement.cpp](source/examples/ex24_displacement.cpp) | :white_check_mark: |
+| Blending | [ex25_blending.cpp](source/examples/ex25_blending.cpp) | :white_check_mark: |
 | Frame Buffer | [ex26_frame_buffer.cpp](source/examples/ex26_frame_buffer.cpp) |  |
 | Postprocessing | [ex27_postprocessing.cpp](source/examples/ex27_postprocessing.cpp) |  |
 | Multiple Render Targets | [ex28_multiple_render_targets.cpp](source/examples/ex28_multiple_render_targets.cpp) |  |

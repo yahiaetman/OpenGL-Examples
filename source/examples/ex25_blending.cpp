@@ -49,6 +49,9 @@ struct Transform {
     }
 };
 
+// Since we need to sort the objects in our scene, it may not be possible to draw the objects in a sorted manner while traversing the scene graph.
+// So instead, we store a what we call a MeshRenderCommand during the traversal and after we finish the traversal, we sort then draw.
+// The MeshRenderCommand should store all the data needed to both sort and draw the objects.
 struct MeshRenderCommand {
     bool transparent;
     float depth;
@@ -58,12 +61,16 @@ struct MeshRenderCommand {
     GLuint texture;
 
     bool operator<(const MeshRenderCommand& other) const {
+        // Let opaque objects be drawn before the transparent ones
         if(transparent != other.transparent) return transparent < other.transparent;
+        // If both are transparent, sort from farthest to nearest
         else if(transparent) return depth > other.depth;
+        // If both are opaque, sort from nearest to farthest
         else return depth < other.depth;
     }
 };
 
+// This example demonstrates how to do blending and some of the solutions to problems that arise while drawing transparent objects.
 class BlendingApplication : public our::Application {
 
     our::ShaderProgram default_program, alpha_test_program;
@@ -72,7 +79,7 @@ class BlendingApplication : public our::Application {
 
     std::unordered_map<std::string, GLuint> textures;
 
-    GLuint sampler;
+    GLuint sampler = 0;
 
     std::shared_ptr<Transform> root;
     std::vector<MeshRenderCommand> render_commands;
@@ -87,20 +94,24 @@ class BlendingApplication : public our::Application {
     GLenum culled_face = GL_BACK;
     GLenum front_face_winding = GL_CCW;
 
-    bool enable_blending;
+    // These variables will control the blending
+    bool enable_blending = false;
     GLenum blend_equation = GL_FUNC_ADD;
-    GLenum blend_source_function = GL_SRC_ALPHA, blend_destination_function = GL_ONE_MINUS_SRC_ALPHA;
+    GLenum blend_source_factor = GL_SRC_ALPHA, blend_destination_factor = GL_ONE_MINUS_SRC_ALPHA;
     glm::vec4 blend_constant_color = {1.0f,1.0f,1.0f,1.0f};
 
+    // These variables will control the alpha testing
     bool enable_alpha_test = false;
     float alpha_test_threshold = 0.5;
 
+    // This variable will enable or disable the alpha to coverage transparency
     bool enable_alpha_to_coverage = false;
 
     bool sort_render_commands = false;
 
     void configureOpenGL() override {
         our::Application::configureOpenGL();
+        // While in most examples we don't enable MSAA, we will need it here for Alpha to Coverage.
         glfwWindowHint(GLFW_SAMPLES, 4);
     }
 
@@ -110,11 +121,13 @@ class BlendingApplication : public our::Application {
 
     void onInitialize() override {
         default_program.create();
+        // We don't need anything special in our shaders to support blending.
         default_program.attach("assets/shaders/ex22_texture_sampling/transform.vert", GL_VERTEX_SHADER);
         default_program.attach("assets/shaders/ex22_texture_sampling/texture.frag", GL_FRAGMENT_SHADER);
         default_program.link();
         alpha_test_program.create();
         alpha_test_program.attach("assets/shaders/ex22_texture_sampling/transform.vert", GL_VERTEX_SHADER);
+        // However, alpha testing is implemented in the fragment shader so we need to use a special program for alpha testing.
         alpha_test_program.attach("assets/shaders/ex25_blending/alpha_test.frag", GL_FRAGMENT_SHADER);
         alpha_test_program.link();
 
@@ -197,6 +210,7 @@ class BlendingApplication : public our::Application {
         return node;
     }
 
+    // This function traverses the scene graph and adds a render command for each node that should be drawn.
     void buildRenderCommands(const std::shared_ptr<Transform>& node, const glm::mat4& parent_transform_matrix){
         glm::mat4 transform_matrix = parent_transform_matrix * node->to_mat4();
         if(node->mesh.has_value()){
@@ -204,8 +218,9 @@ class BlendingApplication : public our::Application {
                 GLuint texture = 0;
                 if(auto tex_it = textures.find(node->texture); tex_it != textures.end())
                     texture = tex_it->second;
-                glm::vec4 transformed_center = transform_matrix * glm::vec4(0, 0, 0, 1);
-                float depth = transformed_center.z / transformed_center.w;
+                // We sort using the depth of the origin of the object. This is an assumption we picked since any point will have its drawback.
+                glm::vec4 transformed_origin = transform_matrix * glm::vec4(0, 0, 0, 1);
+                float depth = transformed_origin.z / transformed_origin.w;
                 render_commands.push_back({
                     node->transparent,
                     depth,
@@ -224,6 +239,7 @@ class BlendingApplication : public our::Application {
     void onDraw(double deltaTime) override {
         camera_controller.update(deltaTime);
 
+        // If alpha testing is enabled, we use the program that supports alpha testing
         auto& program = enable_alpha_test ? alpha_test_program : default_program;
 
         if(enable_depth_test) glEnable(GL_DEPTH_TEST); else glDisable(GL_DEPTH_TEST);
@@ -233,15 +249,42 @@ class BlendingApplication : public our::Application {
         glCullFace(culled_face);
         glFrontFace(front_face_winding);
 
+        // The blending formula has the following form: (source_factor * source) operation (destination_factor * destination).
+        // The operation is specified by the blend equation function.
+        // The possible values are:
+        //  -   GL_FUNC_ADD: the operation is "+".
+        //  -   GL_FUNC_SUBTRACT: the operation is "-".
+        //  -   GL_FUNC_REVERSE_SUBTRACT: the operation is "-" but the operands are reversed.
+        //  -   GL_MIN: the operation picks the minimum value among the 2 operands.
+        //  -   GL_MAX: the operation picks the maximum value among the 2 operands.
         glBlendEquation(blend_equation);
-        glBlendFunc(blend_source_function, blend_destination_function);
+        // This function specifies the source of the factors for each operand.
+        // the possible values are:
+        //  -   GL_ZERO
+        //  -   GL_ONE
+        //  -   GL_SRC_COLOR
+        //  -   GL_ONE_MINUS_SRC_COLOR
+        //  -   GL_DST_COLOR
+        //  -   GL_ONE_MINUS_DST_COLOR
+        //  -   GL_SRC_ALPHA
+        //  -   GL_ONE_MINUS_SRC_ALPHA
+        //  -   GL_DST_ALPHA
+        //  -   GL_ONE_MINUS_DST_ALPHA
+        //  -   GL_CONSTANT_COLOR
+        //  -   GL_ONE_MINUS_CONSTANT_COLOR
+        //  -   GL_CONSTANT_ALPHA
+        //  -   GL_ONE_MINUS_CONSTANT_ALPHA
+        glBlendFunc(blend_source_factor, blend_destination_factor);
+        // In case you're using any of the factors that use the constant color, you need to define it via the glBlendColor function.
         glBlendColor(blend_constant_color.r, blend_constant_color.g, blend_constant_color.b, blend_constant_color.a);
 
+        // Enable alpha to coverage if needed.
         if(enable_alpha_to_coverage) glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
         else glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
 
         glUseProgram(program);
 
+        // If we use alpha testing, we need to send the threshold to the shader
         if(enable_alpha_test) program.set("alpha_threshold", alpha_test_threshold);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -250,6 +293,7 @@ class BlendingApplication : public our::Application {
         glBindSampler(0, sampler);
         program.set("sampler", 0);
 
+        // Clear the render commands from the past frame then build them anew for the current frame.
         render_commands.clear();
         buildRenderCommands(root, camera.getVPMatrix());
 
@@ -257,8 +301,10 @@ class BlendingApplication : public our::Application {
             std::sort(std::begin(render_commands), std::end(render_commands));
 
         for(auto& render_command: render_commands){
+            // If the object is transparent and we want to enable blending, we enable blending.
             if(render_command.transparent && enable_blending) glEnable(GL_BLEND);
             else glDisable(GL_BLEND);
+            // For transparent objects, it is common to disable depth writing as an optimization since they're already sorted.
             glDepthMask(!render_command.transparent || enable_transparent_depth_write);
             glBindTexture(GL_TEXTURE_2D, render_command.texture);
             program.set("tint", render_command.tint);
@@ -290,8 +336,8 @@ class BlendingApplication : public our::Application {
 
         ImGui::Checkbox("Enable Blending", &enable_blending);
         our::OptionMapCombo("Equation", blend_equation, our::gl_enum_options::blend_equations);
-        our::OptionMapCombo("Source Function", blend_source_function, our::gl_enum_options::blend_functions);
-        our::OptionMapCombo("Destination Function", blend_destination_function, our::gl_enum_options::blend_functions);
+        our::OptionMapCombo("Source Function", blend_source_factor, our::gl_enum_options::blend_functions);
+        our::OptionMapCombo("Destination Function", blend_destination_factor, our::gl_enum_options::blend_functions);
         ImGui::ColorEdit4("Blend Constant Color", glm::value_ptr(blend_constant_color), ImGuiColorEditFlags_HDR);
 
         ImGui::Separator();

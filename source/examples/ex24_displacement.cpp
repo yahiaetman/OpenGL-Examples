@@ -28,6 +28,7 @@ struct Transform {
     }
 };
 
+// This example demonstrates that a texture can be used to hold data that are not meant to be interpreted as colors.
 class DisplacementApplication : public our::Application {
 
     our::ShaderProgram program;
@@ -36,9 +37,9 @@ class DisplacementApplication : public our::Application {
 
     std::unordered_map<std::string, GLuint> height_textures;
     std::string current_height_texture_name;
-    GLuint top_texture, bottom_texture;
+    GLuint top_texture = 0, bottom_texture = 0;
 
-    GLuint height_sampler, color_sampler;
+    GLuint height_sampler = 0, color_sampler = 0;
 
     GLenum polygon_mode = GL_FILL;
 
@@ -56,11 +57,14 @@ class DisplacementApplication : public our::Application {
 
     void onInitialize() override {
         program.create();
+        // This vertex shader moves the vertices up in the Y-direction based on the corresponding value in the height texture.
         program.attach("assets/shaders/ex24_displacement/terrain.vert", GL_VERTEX_SHADER);
+        // This fragment shader blends between the colors sampled from 2 textures depending on the vertex height.
         program.attach("assets/shaders/ex24_displacement/terrain.frag", GL_FRAGMENT_SHADER);
         program.link();
 
         GLuint texture;
+        // All the height textures are gray scale so we use a specific function we made that reads and stores only 1 channel per pixel.
         glGenTextures(1, &texture);
         our::texture_utils::loadImageGrayscale(texture, "assets/images/ex24_displacement/Heightmap_Default.png");
         height_textures["default"] = texture;
@@ -82,6 +86,7 @@ class DisplacementApplication : public our::Application {
 
         current_height_texture_name = "default";
 
+        // These textures will be used to color the terrain.
         glGenTextures(1, &top_texture);
         our::texture_utils::loadImage(top_texture, "assets/images/ex24_displacement/mntn_white_d.jpg");
         glGenTextures(1, &bottom_texture);
@@ -90,19 +95,25 @@ class DisplacementApplication : public our::Application {
         our::mesh_utils::Plane(plane, {512, 512}, false);
 
         glGenSamplers(1, &height_sampler);
+        // The height sampler is bound to unit 0 since we will later bind the height texture to unit 0.
         glBindSampler(0, height_sampler);
 
+        // No need for mip maps for the height texture since we will sample it in the vertex shader so we won't be able to calculate the screen-space gradients.
         glSamplerParameteri(height_sampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glSamplerParameteri(height_sampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        // The height texture won't be repeated so no need to use repeat.
         glSamplerParameteri(height_sampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glSamplerParameteri(height_sampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
         glGenSamplers(1, &color_sampler);
+        // The color sampler is bound to units 1 & 2 since we will bind our 2 color textures to these units.
         glBindSampler(1, color_sampler);
         glBindSampler(2, color_sampler);
 
+        // Here, we will use mip maps since they will be sampled in the fragment shader to get the fragment color so it would be nice to have trilinear filtering to enhance the visual quality.
         glSamplerParameteri(color_sampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glSamplerParameteri(color_sampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        // The color textures will be tiled, so we will use repeat wrap mode.
         glSamplerParameteri(color_sampler, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glSamplerParameteri(color_sampler, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
@@ -136,17 +147,22 @@ class DisplacementApplication : public our::Application {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // First, we bind the height texture to unit 0 and set the "height_sampler" uniform to unit 0.
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, height_textures[current_height_texture_name]);
         program.set("height_sampler", 0);
 
+        // Then, we bind the top color texture to unit 1 and set the "terrain_top_sampler" uniform to unit 1.
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, top_texture);
         program.set("terrain_top_sampler", 1);
 
+        // Finally, we bind the bottom color texture to unit 2 and set the "terrain_top_sampler" uniform to unit 2.
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, bottom_texture);
         program.set("terrain_bottom_sampler", 2);
+
+        // Remember that we already bound the sampler in the "onInitialize" function so no need to do it here.
 
         glPolygonMode(GL_FRONT_AND_BACK, polygon_mode);
 

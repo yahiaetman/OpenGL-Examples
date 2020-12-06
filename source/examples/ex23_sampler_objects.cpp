@@ -48,6 +48,7 @@ struct Transform {
     }
 };
 
+// This example shows how to use Sampler objects to separate the sample state from the texture object.
 class SamplerObjectsApplication : public our::Application {
 
     our::ShaderProgram program;
@@ -56,8 +57,10 @@ class SamplerObjectsApplication : public our::Application {
 
     std::unordered_map<std::string, GLuint> textures;
 
-    GLuint sampler;
+    // Samplers are OpenGL objects so we identify them using a GLuint.
+    GLuint sampler = 0;
 
+    // These sampling parameters will be stored in the Sampler object.
     GLenum magnification_filter = GL_LINEAR, minification_filter = GL_LINEAR_MIPMAP_LINEAR;
     GLenum wrap_s = GL_REPEAT, wrap_t = GL_REPEAT;
     glm::vec4 border_color = {1,1,1,1};
@@ -76,6 +79,7 @@ class SamplerObjectsApplication : public our::Application {
 
     void onInitialize() override {
         program.create();
+        // These are the same shaders as the ones we used in the previous example; nothing needs to be changed.
         program.attach("assets/shaders/ex22_texture_sampling/transform.vert", GL_VERTEX_SHADER);
         program.attach("assets/shaders/ex22_texture_sampling/texture.frag", GL_FRAGMENT_SHADER);
         program.link();
@@ -101,6 +105,7 @@ class SamplerObjectsApplication : public our::Application {
         meshes["sphere"] = std::make_unique<our::Mesh>();
         our::mesh_utils::Sphere(*(meshes["sphere"]), {32, 16}, false);
 
+        // Generate one sampler
         glGenSamplers(1, &sampler);
 
         int width, height;
@@ -178,10 +183,13 @@ class SamplerObjectsApplication : public our::Application {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // Since we will always draw one texture per object, we set the active unit to be 0 and kept it active for the rest of the frame
         glActiveTexture(GL_TEXTURE0);
+        // To tell OpenGL which sampler object we will use for this unit, we bind the sampler to unit 0 (which is specified by the 1st parameter of the following function).
         glBindSampler(0, sampler);
         program.set("sampler", 0);
 
+        // Now, instead of setting the parameters for each texture, we just set it to the sampler and each unit that uses that sampler will automatically use these parameters.
         glSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER, magnification_filter);
         glSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER, minification_filter);
         glSamplerParameteri(sampler, GL_TEXTURE_WRAP_S, wrap_s);
