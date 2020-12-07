@@ -39,10 +39,10 @@ This repository contains examples of how to use OpenGL with C++17. It is made fo
 | Frame Buffer | [ex26_frame_buffer.cpp](source/examples/ex26_frame_buffer.cpp) | :white_check_mark: |
 | Postprocessing | [ex27_postprocessing.cpp](source/examples/ex27_postprocessing.cpp) | :white_check_mark: |
 | Multiple Render Targets | [ex28_multiple_render_targets.cpp](source/examples/ex28_multiple_render_targets.cpp) |  |
-| Light | [ex29_light.cpp](source/examples/ex29_light.cpp) |  |
-| Light Array | [ex30_light_array.cpp](source/examples/ex30_light_array.cpp) |  |
-| Multi-Pass Lighting | [ex31_light_multipass.cpp](source/examples/ex31_light_multipass.cpp) |  |
-| Textured Material | [ex32_textured_material.cpp](source/examples/ex32_textured_material.cpp) |  |
+| Light | [ex29_light.cpp](source/examples/ex29_light.cpp) | :white_check_mark: |
+| Light Array | [ex30_light_array.cpp](source/examples/ex30_light_array.cpp) | :white_check_mark: |
+| Multi-Pass Lighting | [ex31_light_multipass.cpp](source/examples/ex31_light_multipass.cpp) | :white_check_mark: |
+| Textured Material | [ex32_textured_material.cpp](source/examples/ex32_textured_material.cpp) | :white_check_mark: |
 
 ## Extra Resources
 
@@ -64,7 +64,7 @@ This repository contains examples of how to use OpenGL with C++17. It is made fo
 - [json 3.9.1](https://github.com/nlohmann/json)
 - [stb](https://github.com/nothings/stb)
 - [tinyobjloader v1.0.6](https://github.com/tinyobjloader/tinyobjloader)
-- [tinygltf v2.4.0](https://github.com/syoyo/tinygltf)
+- [tinygltf v2.4.0](https://github.com/syoyo/tinygltf) [Not Used Yet]
 
 ## License
  [MIT License](LICENSE.md)

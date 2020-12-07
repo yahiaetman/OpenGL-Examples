@@ -27,10 +27,21 @@ namespace glm {
     }
 }
 
+// To support textures in lit materials, we will include multiple texture maps in our struct.
+// 1- Albedo: This will be used to define the diffuse component of the material.
+// 2- Specular: This will be used to define the specular component of the material.
+// 3- Roughness: This will be used to define the shininess (specular power) of the material.
+// 4- Ambient Occlusion (AO): This will be used to define how much ambient each part of the model can receive.
+//                            This is generated specifically for each model and it is multiplied by the albedo to retrieve the ambient component of the material.
+// 5- Emissive: This will be used to fake objects that generate their own light. For example: lava, tv screens, etc.
+//              This component will not be affected by any of the lights in the scene.
+// For each map (except AO), we have a tint to control the color without changing the texture.
+// Since roughness is not a color, we define a range such that the value retrieved from the texture (which range from 0 to 1) can be mapped to a different range.
+// So the roughness after remapping will be mix(roughness_range.x, roughness_range.y, texture(roughness_map, tex_coord).r)
 struct Material {
     std::string albedo_map, specular_map, roughness_map, ambient_occlusion_map, emissive_map;
-    glm::vec3 albedo_tint, specular_tint, emissive_tint;
-    glm::vec2 roughness_range;
+    glm::vec3 albedo_tint{}, specular_tint{}, emissive_tint{};
+    glm::vec2 roughness_range{};
 };
 
 void from_json(const nlohmann::json& j, Material& m){
@@ -76,6 +87,10 @@ enum class LightType {
 struct Light {
     LightType type;
     bool enabled;
+    // Note that we removed the 3 components and replaced it with color.
+    // This is a bit more realistic since light color shouldn't differ between diffuse and specular.
+    // But you may want to keep them separate if you want extra artistic control where you may want to ignore realism.
+    // Also, we no longer have an ambient term in the light. We will keep the ambient in a separate struct called "SkyLight".
     glm::vec3 color;
     glm::vec3 position; // Used for Point and Spot Lights only
     glm::vec3 direction; // Used for Directional and Spot Lights only
@@ -114,6 +129,7 @@ void from_json(const nlohmann::json& j, Light& l){
     }
 }
 
+// Sky light will be used to fake ambient lighting that has different values based on whether the normal points towards the sky or the ground.
 struct SkyLight {
     bool enabled;
     glm::vec3 top_color, middle_color, bottom_color;
@@ -132,7 +148,7 @@ class TexturedMaterialApplication : public our::Application {
 
     std::unordered_map<std::string, std::unique_ptr<our::Mesh>> meshes;
     std::unordered_map<std::string, GLuint> textures;
-    GLuint sampler;
+    GLuint sampler = 0;
 
     std::shared_ptr<Transform> root;
 
@@ -140,7 +156,8 @@ class TexturedMaterialApplication : public our::Application {
     our::FlyCameraController camera_controller;
 
     std::vector<Light> lights;
-    SkyLight sky_light;
+    SkyLight sky_light{};
+    // This will control how bright the sky looks when drawn on the screen.
     float sky_box_exposure = 2.0f;
 
     our::WindowConfiguration getWindowConfiguration() override {
@@ -149,10 +166,12 @@ class TexturedMaterialApplication : public our::Application {
 
     void onInitialize() override {
         program.create();
+        // This shader is responsible for rendering the objects with the lights and textured materials.
         program.attach("assets/shaders/ex29_light/light_transform.vert", GL_VERTEX_SHADER);
         program.attach("assets/shaders/ex32_textured_material/light_array.frag", GL_FRAGMENT_SHADER);
         program.link();
         sky_program.create();
+        // This shader is responsible for rendering the sky box. (Not important for lighting but looks better than a blank background).
         sky_program.attach("assets/shaders/ex32_textured_material/sky_transform.vert", GL_VERTEX_SHADER);
         sky_program.attach("assets/shaders/ex32_textured_material/sky.frag", GL_FRAGMENT_SHADER);
         sky_program.link();
@@ -240,6 +259,8 @@ class TexturedMaterialApplication : public our::Application {
         GLfloat max_anisotropy_upper_bound = 1.0f;
         glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &max_anisotropy_upper_bound);
         glSamplerParameterf(sampler, GL_TEXTURE_MAX_ANISOTROPY_EXT, max_anisotropy_upper_bound);
+        // We will bind our sampler to all the units we will use.
+        // Since we have 5 maps in our material, we will need 5 units.
         for(GLuint unit = 0; unit < 5; ++unit) glBindSampler(unit, sampler);
 
         int width, height;
@@ -304,6 +325,7 @@ class TexturedMaterialApplication : public our::Application {
         glm::mat4 transform_matrix = parent_transform_matrix * node->to_mat4();
         if(node->mesh.has_value()){
             if(auto mesh_it = meshes.find(node->mesh.value()); mesh_it != meshes.end()) {
+                // For each model, we will send the model matrix, model inverse transpose and material properties.
                 program.set("object_to_world", transform_matrix);
                 program.set("object_to_world_inv_transpose", glm::inverse(transform_matrix), true);
                 program.set("material.albedo_tint", node->material.albedo_tint);
@@ -341,12 +363,15 @@ class TexturedMaterialApplication : public our::Application {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // From the camera, we will send the camera position and view-projection matrix.
         program.set("camera_position", camera.getEyePosition());
         program.set("view_projection", camera.getVPMatrix());
+        // For the sky light, we will send its data
         program.set("sky_light.top_color", sky_light.enabled ? sky_light.top_color : glm::vec3(0.0f));
         program.set("sky_light.middle_color", sky_light.enabled ? sky_light.middle_color : glm::vec3(0.0f));
         program.set("sky_light.bottom_color", sky_light.enabled ? sky_light.bottom_color : glm::vec3(0.0f));
 
+        // We will go through all the lights and send the enabled ones to the shader.
         int light_index = 0;
         const int MAX_LIGHT_COUNT = 16;
         for(const auto& light : lights) {
@@ -379,19 +404,27 @@ class TexturedMaterialApplication : public our::Application {
             light_index++;
             if(light_index >= MAX_LIGHT_COUNT) break;
         }
+        // Since the light array in the shader has a constant size, we need to tell the shader how many lights we sent.
         program.set("light_count", light_index);
 
+        // Now we will draw the scene with the lights
         drawNode(root, glm::mat4(1.0f), program);
 
+        // The next steps are not important for lighting.
+        // We will draw a sky box to feel as if we have a sky. This is just for aesthetic and it is just a matter of personal taste.
         glUseProgram(sky_program);
 
+        // We don't need a model matrix for the box. Since it follows the camera, we will send the camera position and add it to the sky box vertices.
         sky_program.set("view_projection", camera.getVPMatrix());
         sky_program.set("camera_position", camera.getEyePosition());
+        // We will then send the sky light to get the colors and the exposure to control how bright the sky will look
         sky_program.set("sky_light.top_color", sky_light.enabled ? sky_light.top_color : glm::vec3(0.0f));
         sky_program.set("sky_light.middle_color", sky_light.enabled ? sky_light.middle_color : glm::vec3(0.0f));
         sky_program.set("sky_light.bottom_color", sky_light.enabled ? sky_light.bottom_color : glm::vec3(0.0f));
         sky_program.set("exposure", sky_box_exposure);
 
+        // Since we are inside the sky box and we are using a cube that was meant to be seen from the outside,
+        // We will temporarily flip the culling to keep the back faces and remove the front faces.
         glCullFace(GL_FRONT);
         meshes["cube"]->draw();
         glCullFace(GL_BACK);

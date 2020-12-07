@@ -71,19 +71,28 @@ enum class LightType {
 };
 
 struct Light {
+    // Here we define our light. First member specifies its type.
     LightType type;
+    // We will use this to enable/disable the light. If it is disabled. we won't send it to the shader.
     bool enabled;
+    // We also define the color & intensity of the light for each component of the Phong model (Ambient, Diffuse, Specular).
     glm::vec3 diffuse, specular, ambient;
     glm::vec3 position; // Used for Point and Spot Lights only
     glm::vec3 direction; // Used for Directional and Spot Lights only
+    // This affects how the light will dim out as we go further from the light.
+    // The formula is light_received = light_emitted / (a*d^2 + b*d + c) where a, b, c are the quadratic, linear and constant factors respectively.
     struct {
         float constant, linear, quadratic;
     } attenuation; // Used for Point and Spot Lights only
+    // This specifies the inner and outer cone of the spot light.
+    // The light power is 0 outside the outer cone, the light power is full inside the inner cone.
+    // The light power is interpolated in between the inner and outer cone.
     struct {
         float inner, outer;
     } spot_angle; // Used for Spot Lights only
 };
 
+// This example demonstrates how to draw a scene with multiple lights where the shader receives an array of lights.
 class LightArrayApplication : public our::Application {
 
     our::ShaderProgram program;
@@ -102,6 +111,7 @@ class LightArrayApplication : public our::Application {
     }
 
     void onInitialize() override {
+        // Now we will use a single shader to process all the lights.
         program.create();
         program.attach("assets/shaders/ex29_light/light_transform.vert", GL_VERTEX_SHADER);
         program.attach("assets/shaders/ex30_light_array/light_array.frag", GL_FRAGMENT_SHADER);
@@ -184,6 +194,7 @@ class LightArrayApplication : public our::Application {
         glm::mat4 transform_matrix = parent_transform_matrix * node->to_mat4();
         if(node->mesh.has_value()){
             if(auto mesh_it = meshes.find(node->mesh.value()); mesh_it != meshes.end()) {
+                // For each model, we will send the model matrix, model inverse transpose and material properties.
                 program.set("object_to_world", transform_matrix);
                 program.set("object_to_world_inv_transpose", glm::inverse(transform_matrix), true);
                 program.set("material.diffuse", node->material.diffuse);
@@ -206,9 +217,11 @@ class LightArrayApplication : public our::Application {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // From the camera, we will send the camera position and view-projection matrix.
         program.set("camera_position", camera.getEyePosition());
         program.set("view_projection", camera.getVPMatrix());
 
+        // We will go through all the lights and send the enabled ones to the shader.
         int light_index = 0;
         const int MAX_LIGHT_COUNT = 16;
         for(const auto& light : lights) {
@@ -244,8 +257,11 @@ class LightArrayApplication : public our::Application {
             light_index++;
             if(light_index >= MAX_LIGHT_COUNT) break;
         }
+        // Since the light array in the shader has a constant size, we need to tell the shader how many lights we sent.
         program.set("light_count", light_index);
 
+        // Since we already sent the view-projection matrix already, we will only send the model matrices from the drawNode function.
+        // That's why we are now sending an identity matrix as the parent transform matrix.
         drawNode(root, glm::mat4(1.0f), program);
     }
 

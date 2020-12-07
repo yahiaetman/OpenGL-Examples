@@ -72,6 +72,7 @@ enum class LightType {
 
 struct Light {
     LightType type;
+    // We will use this to enable/disable the light. If it is disabled. we won't have a pass for it.
     bool enabled;
     glm::vec3 diffuse, specular, ambient;
     glm::vec3 position; // Used for Point and Spot Lights only
@@ -84,8 +85,11 @@ struct Light {
     } spot_angle; // Used for Spot Lights only
 };
 
+// This example demonstrates how to draw a scene with multiple lights where the shader receives only one light.
+// Spoiler: We will use blending to additively accumulate the effect of each light.
 class LightMultipassApplication : public our::Application {
 
+    // We will create a different shader program for each light type.
     std::unordered_map<LightType, our::ShaderProgram> programs;
 
     std::unordered_map<std::string, std::unique_ptr<our::Mesh>> meshes;
@@ -102,6 +106,7 @@ class LightMultipassApplication : public our::Application {
     }
 
     void onInitialize() override {
+        // We will create a different shader program for each light type.
         programs[LightType::DIRECTIONAL].create();
         programs[LightType::DIRECTIONAL].attach("assets/shaders/ex29_light/light_transform.vert", GL_VERTEX_SHADER);
         programs[LightType::DIRECTIONAL].attach("assets/shaders/ex29_light/directional_light.frag", GL_FRAGMENT_SHADER);
@@ -165,7 +170,11 @@ class LightMultipassApplication : public our::Application {
         glCullFace(GL_BACK);
         glFrontFace(GL_CCW);
 
+        // We will use blending to combine the results of the different shaders together.
+        // The combination will be additive so we will GL_FUNC_ADD as our blend equation.
         glBlendEquation(GL_FUNC_ADD);
+        // We are not going to put alpha in our considerations for simplicity.
+        // So to do basic addition, we will just multiply both the source and the destination by 1.
         glBlendFunc(GL_ONE, GL_ONE);
 
         glClearColor(0.88,0.65,0.15, 1);
@@ -193,6 +202,7 @@ class LightMultipassApplication : public our::Application {
         glm::mat4 transform_matrix = parent_transform_matrix * node->to_mat4();
         if(node->mesh.has_value()){
             if(auto mesh_it = meshes.find(node->mesh.value()); mesh_it != meshes.end()) {
+                // For each model, we will send the model matrix, model inverse transpose and material properties.
                 program.set("object_to_world", transform_matrix);
                 program.set("object_to_world_inv_transpose", glm::inverse(transform_matrix), true);
                 program.set("material.diffuse", node->material.diffuse);
@@ -217,6 +227,7 @@ class LightMultipassApplication : public our::Application {
         for(auto& light : lights) {
             if(!light.enabled) continue;
 
+            // If this is the first light we will draw, we should enable blending or it will be added to the background color instead of occluding it.
             if(first_light){
                 glDisable(GL_BLEND);
                 first_light = false;
@@ -224,17 +235,20 @@ class LightMultipassApplication : public our::Application {
                 glEnable(GL_BLEND);
             }
 
+            // For each light, we will pick the shader that supports it
             auto &program = programs[light.type];
 
             glUseProgram(program);
 
+            // From the camera, we will send the camera position and view-projection matrix.
             program.set("camera_position", camera.getEyePosition());
             program.set("view_projection", camera.getVPMatrix());
 
+            // Then we will send the light properties
             program.set("light.diffuse", light.diffuse);
             program.set("light.specular", light.specular);
             program.set("light.ambient", light.ambient);
-
+            // Some properties are only available in some light types
             switch (light.type) {
                 case LightType::DIRECTIONAL:
                     program.set("light.direction", glm::normalize(light.direction));
@@ -256,6 +270,8 @@ class LightMultipassApplication : public our::Application {
                     break;
             }
 
+            // Since we already sent the view-projection matrix already, we will only send the model matrices from the drawNode function.
+            // That's why we are now sending an identity matrix as the parent transform matrix.
             drawNode(root, glm::mat4(1.0f), program);
         }
     }

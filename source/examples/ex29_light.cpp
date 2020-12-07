@@ -24,6 +24,14 @@ namespace glm {
     }
 }
 
+// This struct will be used to define the material properties of an object
+// Based on Phong Lighting Model, we need 3 components:
+// 1- Ambient: which is light coming from equally from all directions such Sky Lights. It is a cheap approximation of indirect lighting.
+//          The amount of ambient reflected by the material is specified by the variable "Ambient".
+// 2- Diffuse: Which is the result of light falling on the surface getting scattered equally in all directions. We will approximate this using the Lambert formula.
+//          The amount of diffuse reflected by the material is specified by the variable "Diffuse".
+// 3- Specular: Which is the result of light reflecting off the surface in the reflection direction. We will use the Phong reflection model to approximate this.
+//          The amount of specular reflected by the material is specified by the variable "Specular". The shininess (a.k.a. specular power) defines the surface smoothness/roughness.
 struct Material {
     glm::vec3 diffuse, specular, ambient;
     float shininess;
@@ -43,6 +51,7 @@ void from_json(const nlohmann::json& j, Material& m){
     m.shininess = j.value<float>("shininess", 1.0f);
 }
 
+// Now each object needs to define its material.
 struct Transform {
     Material material;
     glm::vec3 translation, rotation, scale;
@@ -64,6 +73,10 @@ struct Transform {
     }
 };
 
+// We will support 3 types of lights.
+// 1- Directional Light: where we assume that the light rays are parallel. We use this to approximate sun light.
+// 2- Point Light: where we assume that the light source is a single point that emits light in every direction. It can be used to approximate light bulbs.
+// 3- Spot Light: where we assume that the light source is a single point that emits light in the direction of a cone. It can be used to approximate torches, highway light poles.
 enum class LightType {
     DIRECTIONAL,
     POINT,
@@ -71,20 +84,29 @@ enum class LightType {
 };
 
 struct Light {
+    // Here we define our light. First member specifies its type.
     LightType type;
+    // We also define the color & intensity of the light for each component of the Phong model (Ambient, Diffuse, Specular).
     glm::vec3 diffuse, specular, ambient;
     glm::vec3 position; // Used for Point and Spot Lights only
     glm::vec3 direction; // Used for Directional and Spot Lights only
+    // This affects how the light will dim out as we go further from the light.
+    // The formula is light_received = light_emitted / (a*d^2 + b*d + c) where a, b, c are the quadratic, linear and constant factors respectively.
     struct {
         float constant, linear, quadratic;
     } attenuation; // Used for Point and Spot Lights only
+    // This specifies the inner and outer cone of the spot light.
+    // The light power is 0 outside the outer cone, the light power is full inside the inner cone.
+    // The light power is interpolated in between the inner and outer cone.
     struct {
         float inner, outer;
     } spot_angle; // Used for Spot Lights only
 };
 
+// This example demonstrates how to draw a scene with shaders that approximate lights.
 class LightApplication : public our::Application {
 
+    // We will create a different shader program for each light type.
     std::unordered_map<LightType, our::ShaderProgram> programs;
 
     std::unordered_map<std::string, std::unique_ptr<our::Mesh>> meshes;
@@ -94,13 +116,14 @@ class LightApplication : public our::Application {
     our::Camera camera;
     our::FlyCameraController camera_controller;
 
-    Light light;
+    Light light{};
 
     our::WindowConfiguration getWindowConfiguration() override {
         return { "Light", {1280, 720}, false };
     }
 
     void onInitialize() override {
+        // We will create a different shader program for each light type.
         programs[LightType::DIRECTIONAL].create();
         programs[LightType::DIRECTIONAL].attach("assets/shaders/ex29_light/light_transform.vert", GL_VERTEX_SHADER);
         programs[LightType::DIRECTIONAL].attach("assets/shaders/ex29_light/directional_light.frag", GL_FRAGMENT_SHADER);
@@ -180,6 +203,7 @@ class LightApplication : public our::Application {
         glm::mat4 transform_matrix = parent_transform_matrix * node->to_mat4();
         if(node->mesh.has_value()){
             if(auto mesh_it = meshes.find(node->mesh.value()); mesh_it != meshes.end()) {
+                // For each model, we will send the model matrix, model inverse transpose and material properties.
                 program.set("object_to_world", transform_matrix);
                 program.set("object_to_world_inv_transpose", glm::inverse(transform_matrix), true);
                 program.set("material.diffuse", node->material.diffuse);
@@ -197,19 +221,22 @@ class LightApplication : public our::Application {
     void onDraw(double deltaTime) override {
         camera_controller.update(deltaTime);
 
+        // We will pick the shader based on the light type
         auto& program = programs[light.type];
 
         glUseProgram(program);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // From the camera, we will send the camera position and view-projection matrix.
         program.set("camera_position", camera.getEyePosition());
         program.set("view_projection", camera.getVPMatrix());
 
+        // Then we will send the light properties
         program.set("light.diffuse", light.diffuse);
         program.set("light.specular", light.specular);
         program.set("light.ambient", light.ambient);
-
+        // Some properties are only available in some light types
         switch(light.type){
             case LightType::DIRECTIONAL:
                 program.set("light.direction", glm::normalize(light.direction));
@@ -231,6 +258,8 @@ class LightApplication : public our::Application {
                 break;
         }
 
+        // Since we already sent the view-projection matrix already, we will only send the model matrices from the drawNode function.
+        // That's why we are now sending an identity matrix as the parent transform matrix.
         drawNode(root, glm::mat4(1.0f), program);
     }
 
